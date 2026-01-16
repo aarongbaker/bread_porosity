@@ -1,0 +1,69 @@
+AI & DEFECT DETECTION FEATURES - QUICK START
+=============================================
+
+WHAT WAS ADDED
+==============
+
+1. Defect Detection Module (defect_detection.py)
+   - Detects UNEVEN RISE (fermentation uniformity)
+   - Detects DENSE SPOTS (hard spots in crumb)
+   - Severity score 0-100
+   - Actionable recommendations
+
+2. ML Classifier Module (ml_simple.py)
+   - Train on YOUR bread images
+   - Classify new bread as GOOD or PROBLEM
+   - Confidence scores
+   - No external dataset needed
+
+3. Two New GUI Tabs
+   - "Defects" tab for defect analysis
+   - "ML Training" tab for classifier
+
+HOW TO USE
+==========
+
+DEFECT ANALYSIS (1 minute)
+-----------
+1. Go to "Defects" tab
+2. Select an image in Image Library
+3. Click "Analyze Current Image"
+4. See severity score, grade, and recommendations
+5. Read suggestions for next batch
+
+ML CLASSIFIER (10 minutes setup, then instant predictions)
+---
+Step 1: Build Training Data
+  - Select "good" bread image
+  - Click "Add Good Image"
+  - Repeat 5-10 times with good images
+  - Select "problem" bread image
+  - Click "Add Problem Image"
+  - Repeat 5-10 times with problem images
+
+Step 2: Train Model
+  - Click "Train Model"
+  - Wait for message (1-2 seconds)
+
+Step 3: Use for Predictions
+  - Select any image
+  - Click "Predict Current"
+  - Get GOOD/PROBLEM prediction with confidence
+
+COMBINED QA WORKFLOW
+===================
+
+1. Analyze batch (Defects tab → Batch Analysis)
+2. Get severity scores on all images
+3. For suspicious images: Get ML prediction
+4. Review recommendations
+5. Apply to next batch
+6. Quality improves → Model improves
+
+FILES ADDED
+===========
+- defect_detection.py (350+ lines)
+- ml_simple.py (480+ lines)
+- ML_AND_DEFECTS.md (comprehensive guide)
+
+For detailed documentation, see ML_AND_DEFECTS.md

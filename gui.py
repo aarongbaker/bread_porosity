@@ -16,6 +16,8 @@ from recipe_database import RecipeDatabase
 from recipe_predictor import RecipePredictor
 from export_reporting import ExportEngine
 from quality_control import QualityControlManager
+from defect_detection import DefectDetector
+from ml_simple import SimpleMLClassifier
 import traceback
 
 
@@ -652,6 +654,241 @@ class BreadPorositytoolGUI:
                                insertbackground=self.bg_accent)
         self.qc_text.pack(fill=tk.BOTH, expand=True)
         qc_scroll.config(command=self.qc_text.yview)
+        
+        # Defect Detection Tab
+        defect_tab = ttk.Frame(self.notebook)
+        self.notebook.add(defect_tab, text="  Defects")
+        
+        defect_container = tk.Frame(defect_tab, bg=self.bg_secondary)
+        defect_container.pack(fill=tk.BOTH, expand=True, padx=12, pady=12)
+        
+        defect_header = tk.Label(defect_container, text="Defect Detection", 
+                                font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
+        defect_header.pack(anchor=tk.W, pady=(0, 10))
+        
+        defect_controls = tk.Frame(defect_container, bg=self.bg_secondary)
+        defect_controls.pack(fill=tk.X, pady=(0, 10))
+        
+        ttk.Button(defect_controls, text="Analyze Current Image", 
+                  command=self.detect_defects_current).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(defect_controls, text="Batch Analysis", 
+                  command=self.detect_defects_batch).pack(side=tk.LEFT, padx=(0, 5))
+        
+        defect_scroll = ttk.Scrollbar(defect_container)
+        defect_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        self.defect_text = tk.Text(defect_container, yscrollcommand=defect_scroll.set,
+                                  font=("Consolas", 9), bg=self.bg_tertiary,
+                                  fg=self.text_primary, relief=tk.FLAT,
+                                  borderwidth=0, padx=12, pady=12,
+                                  insertbackground=self.bg_accent)
+        self.defect_text.pack(fill=tk.BOTH, expand=True)
+        defect_scroll.config(command=self.defect_text.yview)
+        
+        self.defect_detector = DefectDetector(verbose=False)
+        
+        # ML Training Tab
+        ml_tab = ttk.Frame(self.notebook)
+        self.notebook.add(ml_tab, text="  ML Training")
+        
+        ml_container = tk.Frame(ml_tab, bg=self.bg_secondary)
+        ml_container.pack(fill=tk.BOTH, expand=True, padx=12, pady=12)
+        
+        ml_header = tk.Label(ml_container, text="Machine Learning Classifier", 
+                            font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
+        ml_header.pack(anchor=tk.W, pady=(0, 10))
+        
+        ml_top_frame = tk.Frame(ml_container, bg=self.bg_secondary)
+        ml_top_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        # Training data status
+        ml_status_label = tk.Label(ml_top_frame, text="Training Data:", 
+                                  font=("Segoe UI", 9), fg=self.text_secondary, bg=self.bg_secondary)
+        ml_status_label.pack(anchor=tk.W)
+        
+        self.ml_status_text = tk.Label(ml_top_frame, text="No data loaded", 
+                                      font=("Segoe UI", 8), fg=self.text_secondary, bg=self.bg_secondary)
+        self.ml_status_text.pack(anchor=tk.W)
+        
+        # Training buttons
+        ml_buttons = tk.Frame(ml_top_frame, bg=self.bg_secondary)
+        ml_buttons.pack(fill=tk.X, pady=(10, 0))
+        
+        ttk.Button(ml_buttons, text="Add Good Image", 
+                  command=lambda: self.ml_add_image("good")).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(ml_buttons, text="Add Problem Image", 
+                  command=lambda: self.ml_add_image("problem")).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(ml_buttons, text="Train Model", 
+                  command=self.ml_train).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(ml_buttons, text="Predict Current", 
+                  command=self.ml_predict_current).pack(side=tk.LEFT)
+        
+        ml_scroll = ttk.Scrollbar(ml_container)
+        ml_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        self.ml_text = tk.Text(ml_container, yscrollcommand=ml_scroll.set,
+                              font=("Consolas", 9), bg=self.bg_tertiary,
+                              fg=self.text_primary, relief=tk.FLAT,
+                              borderwidth=0, padx=12, pady=12,
+                              insertbackground=self.bg_accent)
+        self.ml_text.pack(fill=tk.BOTH, expand=True)
+        ml_scroll.config(command=self.ml_text.yview)
+        
+        self.ml_classifier = SimpleMLClassifier(verbose=False)
+        self.update_ml_status()
+    
+    def detect_defects_current(self):
+        """Analyze current image for defects"""
+        if not self.current_image_path:
+            messagebox.showwarning("Warning", "Please select an image first")
+            return
+        
+        self.defect_text.delete(1.0, tk.END)
+        self.set_status("Analyzing defects...", color=self.bg_accent)
+        
+        try:
+            result = self.defect_detector.detect_defects(str(self.current_image_path))
+            
+            output = f"DEFECT ANALYSIS REPORT\n"
+            output += f"{'=' * 60}\n\n"
+            output += f"Image: {Path(self.current_image_path).name}\n"
+            output += f"Overall Severity: {result['overall_severity']:.1f}/100\n"
+            output += f"Grade: {result['defect_grade']}\n\n"
+            
+            output += f"UNEVEN RISE\n{'-' * 60}\n"
+            output += f"  Detected: {'Yes' if result['uneven_rise']['detected'] else 'No'}\n"
+            output += f"  Severity: {result['uneven_rise']['severity']:.1f}/100\n"
+            output += f"  Center Brightness: {result['uneven_rise']['center_brightness']:.0f}\n"
+            output += f"  Edge Brightness: {result['uneven_rise']['edge_brightness']:.0f}\n\n"
+            
+            output += f"DENSE SPOTS\n{'-' * 60}\n"
+            output += f"  Detected: {'Yes' if result['dense_spots']['detected'] else 'No'}\n"
+            output += f"  Severity: {result['dense_spots']['severity']:.1f}/100\n"
+            output += f"  Dense Percentage: {result['dense_spots']['dense_percentage']:.2f}%\n"
+            output += f"  Number of Clusters: {result['dense_spots']['num_clusters']}\n\n"
+            
+            output += f"RECOMMENDATIONS\n{'-' * 60}\n"
+            for rec in result['recommendations']:
+                output += f"  - {rec}\n"
+            
+            self.defect_text.insert(1.0, output)
+            self.set_status("Defect analysis complete", color=self.success_color)
+            
+        except Exception as e:
+            self.defect_text.insert(1.0, f"Error: {str(e)}\n{traceback.format_exc()}")
+            self.set_status(f"Error: {str(e)}", color=self.error_color)
+    
+    def detect_defects_batch(self):
+        """Analyze batch for defects"""
+        if not self.unprocessed_dir.exists():
+            messagebox.showwarning("Warning", "No images directory found")
+            return
+        
+        self.defect_text.delete(1.0, tk.END)
+        self.set_status("Analyzing batch defects...", color=self.bg_accent)
+        
+        try:
+            results = self.defect_detector.batch_detect(str(self.unprocessed_dir))
+            
+            if 'error' in results:
+                self.defect_text.insert(1.0, f"Error: {results['error']}")
+                return
+            
+            output = f"BATCH DEFECT ANALYSIS\n"
+            output += f"{'=' * 60}\n\n"
+            output += f"Images Analyzed: {results['num_images']}\n"
+            output += f"Average Severity: {results['avg_severity']:.1f}/100\n"
+            output += f"Batch Grade: {results['batch_grade']}\n"
+            output += f"Pass Rate: {results['pass_rate']:.1f}%\n\n"
+            
+            output += f"DEFECT SUMMARY\n{'-' * 60}\n"
+            output += f"  Uneven Rise: {results['uneven_rise_count']} images\n"
+            output += f"  Dense Spots: {results['dense_spots_count']} images\n\n"
+            
+            output += f"INDIVIDUAL RESULTS\n{'-' * 60}\n"
+            for i, result in enumerate(results['results'], 1):
+                output += f"\n{i}. {Path(result['image_path']).name}\n"
+                output += f"   Severity: {result['overall_severity']:.1f} ({result['defect_grade']})\n"
+            
+            self.defect_text.insert(1.0, output)
+            self.set_status("Batch analysis complete", color=self.success_color)
+            
+        except Exception as e:
+            self.defect_text.insert(1.0, f"Error: {str(e)}\n{traceback.format_exc()}")
+            self.set_status(f"Error: {str(e)}", color=self.error_color)
+    
+    def update_ml_status(self):
+        """Update ML training status display"""
+        status = self.ml_classifier.get_training_status()
+        status_str = (f"Good: {status['good_images']} | Problem: {status['problem_images']} | "
+                     f"Total: {status['total_training_images']}")
+        if status['model_trained']:
+            status_str += " | Model: TRAINED"
+        self.ml_status_text.config(text=status_str)
+    
+    def ml_add_image(self, label):
+        """Add image to ML training set"""
+        if not self.current_image_path:
+            messagebox.showwarning("Warning", "Please select an image first")
+            return
+        
+        success = self.ml_classifier.add_training_image(str(self.current_image_path), label)
+        if success:
+            self.update_ml_status()
+            self.ml_text.insert(tk.END, f"Added {label} image: {self.current_image_path.name}\n")
+            self.ml_text.see(tk.END)
+            messagebox.showinfo("Success", f"Added image as '{label}'")
+        else:
+            messagebox.showerror("Error", "Could not add image")
+    
+    def ml_train(self):
+        """Train ML model"""
+        status = self.ml_classifier.get_training_status()
+        if not status['ready_to_train']:
+            messagebox.showwarning("Not Ready", 
+                f"Need at least 1 good and 1 problem image\nCurrent: {status['good_images']} good, {status['problem_images']} problem")
+            return
+        
+        result = self.ml_classifier.train()
+        if result:
+            self.ml_text.delete(1.0, tk.END)
+            output = f"MODEL TRAINING COMPLETE\n"
+            output += f"{'=' * 60}\n"
+            output += f"Good Images: {result['good_count']}\n"
+            output += f"Problem Images: {result['problem_count']}\n"
+            output += f"Total Training Images: {result['total_training_images']}\n"
+            output += f"Model Status: READY\n\n"
+            output += f"You can now make predictions on new images!"
+            self.ml_text.insert(1.0, output)
+            self.update_ml_status()
+            messagebox.showinfo("Success", "Model trained successfully!")
+    
+    def ml_predict_current(self):
+        """Predict on current image"""
+        if not self.current_image_path:
+            messagebox.showwarning("Warning", "Please select an image first")
+            return
+        
+        status = self.ml_classifier.get_training_status()
+        if not status['model_trained']:
+            messagebox.showwarning("Not Ready", "Please train the model first")
+            return
+        
+        result = self.ml_classifier.predict(str(self.current_image_path))
+        
+        self.ml_text.delete(1.0, tk.END)
+        output = f"PREDICTION RESULT\n"
+        output += f"{'=' * 60}\n"
+        output += f"Image: {Path(self.current_image_path).name}\n"
+        output += f"Prediction: {result['prediction'].upper()}\n"
+        output += f"Confidence: {result['confidence']:.1f}%\n\n"
+        output += f"Confidence Breakdown\n{'-' * 60}\n"
+        output += f"  Good Match: {result['confidence_good']:.1f}%\n"
+        output += f"  Problem Match: {result['confidence_problem']:.1f}%\n"
+        
+        self.ml_text.insert(1.0, output)
+        messagebox.showinfo("Prediction", f"{result['prediction'].upper()}\nConfidence: {result['confidence']:.0f}%")
+    
     
     def refresh_image_list(self):
         """Refresh list of unprocessed images"""

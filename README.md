@@ -32,6 +32,13 @@
 - **Alert System** - Real-time alerts for out-of-spec batches
 - **Custom Profiles** - Define your own standards
 
+### AI & Defect Detection (NEW)
+- **Automated Defect Detection** - Identifies uneven rise and dense spots
+- **Simple ML Classifier** - Train on your own images to classify good/problem bread
+- **No Dataset Required** - Build training data as you analyze bread
+- **Batch Analysis** - Analyze multiple images at once
+- **Confidence Scoring** - Know how certain predictions are
+
 ### Export & Reporting
 - **Multiple Formats** - CSV, Excel, PDF exports
 - **Summary Charts** - Porosity trends, distributions
@@ -150,7 +157,7 @@ bread_porosity/
 
 ---
 
-## GUI Tabs (9 Total)
+## GUI Tabs (11 Total)
 
 | Tab | Purpose |
 |-----|----------|
@@ -163,6 +170,8 @@ bread_porosity/
 | Compare | Recipe comparison |
 | Export | Data export |
 | Quality Control | QC & profiles |
+| Defects | Defect detection & analysis |
+| ML Training | Machine learning classifier |
 
 ---
 
@@ -172,6 +181,7 @@ bread_porosity/
 - **[Features](FEATURES.md)** - Complete feature reference
 - **[Installation](INSTALLATION.md)** - Detailed setup
 - **[Bread Type Profiles](BREAD_TYPE_PROFILES.md)** - Profile system
+- **[ML & Defects](ML_AND_DEFECTS.md)** - AI features guide
 - **[GitHub Safe](GITHUB_SAFE.md)** - Production version
 
 ---
