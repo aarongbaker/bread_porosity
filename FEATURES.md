@@ -367,32 +367,32 @@ Per image:
 ## Tips & Best Practices
 
 **Recipes:**
-- ✅ Include all parameters when logging
-- ✅ Add environmental data if available
-- ✅ Use clear, descriptive names
-- ✅ Document notes with reasoning
-- ✅ Update with measured porosity
+-  Include all parameters when logging
+-  Add environmental data if available
+-  Use clear, descriptive names
+-  Document notes with reasoning
+-  Update with measured porosity
 
 **Analysis:**
-- ✅ Consistent lighting & camera angle
-- ✅ Accurate pixel size calibration
-- ✅ Test multiple slices per loaf
-- ✅ Document analysis conditions
-- ✅ Keep analysis logs
+-  Consistent lighting & camera angle
+-  Accurate pixel size calibration
+-  Test multiple slices per loaf
+-  Document analysis conditions
+-  Keep analysis logs
 
 **Optimization:**
-- ✅ Start with proven base recipe
-- ✅ Change one parameter at a time
-- ✅ Test at different scales
-- ✅ Track environmental factors
-- ✅ Document all iterations
+-  Start with proven base recipe
+-  Change one parameter at a time
+-  Test at different scales
+-  Track environmental factors
+-  Document all iterations
 
 **Quality Control:**
-- ✅ Target CV < 15% for production
-- ✅ Monitor consistency regularly
-- ✅ Adjust when CV > 20%
-- ✅ Document all changes
-- ✅ Track seasonal variations
+-  Target CV < 15% for production
+-  Monitor consistency regularly
+-  Adjust when CV > 20%
+-  Document all changes
+-  Track seasonal variations
 
 ---
 

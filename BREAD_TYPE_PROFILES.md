@@ -4,12 +4,12 @@
 
 The Bread Porosity Analysis Tool now supports **multiple quality control profiles for different bread types**. Each bread type has its own customized quality standards, allowing you to maintain appropriate quality criteria for:
 
-- 🥐 **Sourdough** - Higher porosity, rustic crumb
-- 🌾 **Whole Wheat** - Lower porosity, denser crumb
-- 🥖 **Baguette** - High porosity, open crumb
-- 📦 **Sandwich Bread** - Low porosity, fine crumb
-- 🇮🇹 **Ciabatta** - Very high porosity, large irregular holes
-- ⚙️ **Custom** - User-defined profile
+- **Sourdough** - Higher porosity, rustic crumb
+- **Whole Wheat** - Lower porosity, denser crumb
+- **Baguette** - High porosity, open crumb
+- **Sandwich Bread** - Low porosity, fine crumb
+- **Ciabatta** - Very high porosity, large irregular holes
+- **Custom** - User-defined profile
 
 ---
 
@@ -27,9 +27,9 @@ The Bread Porosity Analysis Tool now supports **multiple quality control profile
 | Batch CV Max | 15% | - |
 
 **Quality Grades**:
-- 🌟 **Excellent**: Porosity 25-32%, Uniformity 0.85+
-- ⭐ **Good**: Porosity 22-35%, Uniformity 0.75+
-- ⭐⭐ **Fair**: Porosity 18-38%, Uniformity 0.65+
+- **Excellent**: Porosity 25-32%, Uniformity 0.85+
+- **Good**: Porosity 22-35%, Uniformity 0.75+
+- **Fair**: Porosity 18-38%, Uniformity 0.65+
 
 ---
 
@@ -45,9 +45,9 @@ The Bread Porosity Analysis Tool now supports **multiple quality control profile
 | Batch CV Max | 18% | - |
 
 **Quality Grades**:
-- 🌟 **Excellent**: Porosity 20-26%, Uniformity 0.80+
-- ⭐ **Good**: Porosity 16-28%, Uniformity 0.70+
-- ⭐⭐ **Fair**: Porosity 12-32%, Uniformity 0.60+
+- **Excellent**: Porosity 20-26%, Uniformity 0.80+
+- **Good**: Porosity 16-28%, Uniformity 0.70+
+- **Fair**: Porosity 12-32%, Uniformity 0.60+
 
 ---
 
@@ -63,9 +63,9 @@ The Bread Porosity Analysis Tool now supports **multiple quality control profile
 | Batch CV Max | 20% | - |
 
 **Quality Grades**:
-- 🌟 **Excellent**: Porosity 35-42%, Uniformity 0.80+
-- ⭐ **Good**: Porosity 30-45%, Uniformity 0.70+
-- ⭐⭐ **Fair**: Porosity 28-48%, Uniformity 0.60+
+- **Excellent**: Porosity 35-42%, Uniformity 0.80+
+- **Good**: Porosity 30-45%, Uniformity 0.70+
+- **Fair**: Porosity 28-48%, Uniformity 0.60+
 
 ---
 
@@ -81,9 +81,9 @@ The Bread Porosity Analysis Tool now supports **multiple quality control profile
 | Batch CV Max | 12% | - |
 
 **Quality Grades**:
-- 🌟 **Excellent**: Porosity 15-20%, Uniformity 0.85+
-- ⭐ **Good**: Porosity 12-22%, Uniformity 0.75+
-- ⭐⭐ **Fair**: Porosity 10-25%, Uniformity 0.65+
+- **Excellent**: Porosity 15-20%, Uniformity 0.85+
+- **Good**: Porosity 12-22%, Uniformity 0.75+
+- **Fair**: Porosity 10-25%, Uniformity 0.65+
 
 ---
 
@@ -99,9 +99,9 @@ The Bread Porosity Analysis Tool now supports **multiple quality control profile
 | Batch CV Max | 16% | - |
 
 **Quality Grades**:
-- 🌟 **Excellent**: Porosity 30-37%, Uniformity 0.80+
-- ⭐ **Good**: Porosity 25-40%, Uniformity 0.70+
-- ⭐⭐ **Fair**: Porosity 22-43%, Uniformity 0.60+
+- **Excellent**: Porosity 30-37%, Uniformity 0.80+
+- **Good**: Porosity 25-40%, Uniformity 0.70+
+- **Fair**: Porosity 22-43%, Uniformity 0.60+
 
 ---
 
@@ -227,21 +227,21 @@ evaluation = qc.evaluate_analysis(metrics)
 Each bread type evaluation includes:
 
 1. **Acceptance Status**
-   - ✅ Porosity: Within/outside target range
-   - ✅ Holes: Within/outside count/size range
-   - ✅ Uniformity: Above/below minimum score
+   -  Porosity: Within/outside target range
+   -  Holes: Within/outside count/size range
+   -  Uniformity: Above/below minimum score
 
 2. **Quality Grade**
-   - 🌟 Excellent
-   - ⭐ Good
-   - ⭐⭐ Fair
-   - ❌ Poor
+   -  Excellent
+   -  Good
+   -  Fair
+   -  Poor
 
 3. **Bread-Type-Specific Alerts**
    - Examples for Ciabatta (high porosity bread):
-     - "⚠️ Porosity 28% below target 30-45%"
+     - "⚠ Porosity 28% below target 30-45%"
    - Examples for Sandwich Bread (low porosity bread):
-     - "❌ Porosity 35% way above target 12-22%"
+     - " Porosity 35% way above target 12-22%"
 
 4. **Targeted Recommendations**
    - Different advice for different bread types
@@ -264,7 +264,7 @@ When checking batch consistency, the tool:
 ```
 BATCH CONSISTENCY ANALYSIS
 Samples Analyzed: 10
-Status: PASS ✅
+Status: PASS 
 Message: Batch is consistent (CV: 12.3% < 15%)
 
 POROSITY STATISTICS:
@@ -377,8 +377,8 @@ qc.update_threshold("hole_count_target", min_val=80, max_val=420)
 
 ### 1. Set Correct Bread Type Before Analysis
 ```
-✅ DO: Select "Ciabatta" → Analyze → Evaluate
-❌ DON'T: Analyze as sourdough, then change to ciabatta
+ DO: Select "Ciabatta" → Analyze → Evaluate
+ DON'T: Analyze as sourdough, then change to ciabatta
 ```
 
 ### 2. Customize Standards for Your Recipe
@@ -426,11 +426,11 @@ qc.update_threshold("hole_count_target", min_val=80, max_val=420)
 ## Summary
 
 **Bread Type Profiles** allow you to:
-- ✅ Set quality standards specific to each bread type
-- ✅ Automatically adjust evaluation criteria
-- ✅ Track different breads with appropriate thresholds
-- ✅ Create custom profiles for specialty breads
-- ✅ Maintain consistent quality within each type
+-  Set quality standards specific to each bread type
+-  Automatically adjust evaluation criteria
+-  Track different breads with appropriate thresholds
+-  Create custom profiles for specialty breads
+-  Maintain consistent quality within each type
 
 **Default Profiles**: Sourdough, Whole Wheat, Ciabatta, Sandwich, Baguette, Custom
 
@@ -442,4 +442,4 @@ qc.update_threshold("hole_count_target", min_val=80, max_val=420)
 
 ---
 
-**Status: ✅ Bread Type Profiles Feature Complete**
+**Status:  Bread Type Profiles Feature Complete**

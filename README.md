@@ -1,4 +1,4 @@
-# 🍞 Bread Porosity Analysis Tool
+# Bread Porosity Analysis Tool
 
 **Professional image processing software for measuring bread porosity, crumb structure, and quality metrics with machine learning predictions and real-time quality control.**
 
@@ -8,23 +8,23 @@
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-### 📊 Core Analysis
+### Core Analysis
 - **Porosity Measurement** - Calculate hole percentage of crumb structure
 - **Hole Analysis** - Count, diameter, distribution, uniformity metrics
 - **Shape Analysis** - Aspect ratio, orientation, anisotropy
 - **Multi-slice Loaves** - Analyze entire loaf for consistency
 - **Statistical Dashboard** - Comprehensive metrics and visualizations
 
-### 🍞 Recipe Management
+### Recipe Management
 - **Recipe Database** - Store bread recipes with formulas
 - **Porosity Prediction** - ML predictions from recipe parameters
 - **Recipe Comparison** - Compare multiple recipes
 - **Variant Creation** - Generate variants by scaling
 - **Recipe Families** - Track recipe lineage
 
-### ⚙️ Quality Control
+### Quality Control
 - **Multi-Profile Support** - Different standards for different breads
 - **5 Default Profiles** - Sourdough, Whole Wheat, Ciabatta, Sandwich, Baguette
 - **SPC Statistics** - Statistical Process Control
@@ -32,13 +32,13 @@
 - **Alert System** - Real-time alerts for out-of-spec batches
 - **Custom Profiles** - Define your own standards
 
-### 📈 Export & Reporting
+### Export & Reporting
 - **Multiple Formats** - CSV, Excel, PDF exports
 - **Summary Charts** - Porosity trends, distributions
 - **Batch Reports** - Comprehensive summaries
 - **Professional Reports** - Ready to share
 
-### 🎨 Modern UI
+### Modern UI
 - **Dark Professional Theme** - Material Design inspired
 - **9 Organized Tabs** - Logical workflow
 - **Real-time Status** - Live feedback
@@ -46,7 +46,7 @@
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
@@ -61,21 +61,21 @@ python gui.py
 ### First Analysis
 
 1. **Open GUI**: `python gui.py`
-2. **Load Image**: Click "📂 Open Folder"
+2. **Load Image**: Click "Open Folder"
 3. **Select Image**: Choose bread slice
 4. **Analyze**: Click "▶ Analyze"
-5. **View Results**: Check "📈 Results" tab
+5. **View Results**: Check "Results" tab
 
 ### Multi-Slice Loaf
 
 1. **Name slices**: `loaf_001.jpg`, `loaf_002.jpg`, etc.
 2. **Select mode**: "Loaf (Multiple Slices)"
-3. **Analyze**: Click "▶ Analyze"
-4. **Check uniformity**: Go to "🥖 Consistency" tab
+3. **Analyze**: Click "Analyze"
+4. **Check uniformity**: Go to "Consistency" tab
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 bread_porosity/
@@ -95,7 +95,7 @@ bread_porosity/
 
 ---
 
-## 🔧 Configuration
+## Configuration
 
 ### `config.json`
 ```json
@@ -129,44 +129,44 @@ bread_porosity/
 
 ---
 
-## 🍞 Bread Type Profiles
+## Bread Type Profiles
 
 ### Default Profiles
 
 | Type | Porosity | Holes | Use Case |
 |------|----------|-------|----------|
-| 🥐 Sourdough | 20-35% | 100-400 | Traditional artisan |
-| 🌾 Whole Wheat | 15-28% | 60-250 | Whole grain |
-| 🥖 Ciabatta | 30-45% | 200-600 | Very open crumb |
-| 📦 Sandwich | 12-22% | 50-200 | Fine, uniform |
-| 🇮🇹 Baguette | 25-40% | 150-500 | Crispy crust |
-| ⚙️ Custom | User-defined | User-defined | Your recipe |
+| Sourdough | 20-35% | 100-400 | Traditional artisan |
+| Whole Wheat | 15-28% | 60-250 | Whole grain |
+| Ciabatta | 30-45% | 200-600 | Very open crumb |
+| Sandwich | 12-22% | 50-200 | Fine, uniform |
+| Baguette | 25-40% | 150-500 | Crispy crust |
+| Custom | User-defined | User-defined | Your recipe |
 
 ### Switch Profiles
 1. Quality Control tab
 2. Select type from dropdown
-3. Click "👁️ View Profile"
+3. Click "👁 View Profile"
 4. Analyze images - evaluated against profile
 
 ---
 
-## 📊 GUI Tabs (9 Total)
+## GUI Tabs (9 Total)
 
-| Tab | Icon | Purpose |
-|-----|------|---------|
-| Preview | 🖼️ | Image preview |
-| Results | 📈 | Analysis results |
-| Metrics | 📊 | JSON metrics |
-| Recipes | 🍞 | Recipe management |
-| Statistics | 📊 | Stats dashboard |
-| Consistency | 🥖 | Loaf uniformity |
-| Compare | ⚖️ | Recipe comparison |
-| Export | 💾 | Data export |
-| Quality Control | ✓ | QC & profiles |
+| Tab | Purpose |
+|-----|----------|
+| Preview | Image preview |
+| Results | Analysis results |
+| Metrics | JSON metrics |
+| Recipes | Recipe management |
+| Statistics | Stats dashboard |
+| Consistency | Loaf uniformity |
+| Compare | Recipe comparison |
+| Export | Data export |
+| Quality Control | QC & profiles |
 
 ---
 
-## 📖 Documentation
+## Documentation
 
 - **[Quick Start](QUICK_START.md)** - 5-minute guide
 - **[Features](FEATURES.md)** - Complete feature reference
@@ -176,7 +176,7 @@ bread_porosity/
 
 ---
 
-## 🔬 What It Measures
+## What It Measures
 
 **Porosity**
 - Total hole percentage
@@ -196,7 +196,7 @@ bread_porosity/
 
 ---
 
-## 💼 Workflows
+## Workflows
 
 ### Daily QC
 ```
@@ -219,7 +219,7 @@ Compare profiles → Export PDF
 
 ---
 
-## 📊 Export Formats
+## Export Formats
 
 - **CSV** - Spreadsheet analysis
 - **Excel** - Formatted workbook
@@ -228,7 +228,7 @@ Compare profiles → Export PDF
 
 ---
 
-## 🔧 Technical
+## Technical
 
 **Requirements**
 - Python 3.9+
@@ -249,7 +249,7 @@ pip install -r requirements.txt
 
 ---
 
-## ⚡ Performance
+## Performance
 
 - Single image: < 5 seconds
 - Loaf (5 slices): < 30 seconds
@@ -258,20 +258,20 @@ pip install -r requirements.txt
 
 ---
 
-## 🎯 Version
+## Version
 
 **Current**: 2.0.0 (Production Ready)
 
 **Latest Features**
-- ✅ Multi-profile QC system
-- ✅ Export/reporting engine
-- ✅ Modern dark theme UI
-- ✅ Real-time predictions
-- ✅ Statistical process control
+- Multi-profile QC system
+- Export/reporting engine
+- Modern dark theme UI
+- Real-time predictions
+- Statistical process control
 
 ---
 
-## 📝 Common Tasks
+## Common Tasks
 
 ### Analyze Single Image
 File → Unprocessed → Select → Analyze → Results
@@ -290,7 +290,7 @@ Export tab → Select format → Click Export
 
 ---
 
-## 🆘 Troubleshooting
+## Troubleshooting
 
 **GUI won't start**
 - Check Python 3.9+
@@ -311,7 +311,7 @@ Export tab → Select format → Click Export
 
 ---
 
-## 📝 License
+##  License
 
 MIT License - See LICENSE file
 
@@ -323,5 +323,5 @@ MIT License - See LICENSE file
 python gui.py
 ```
 
-**Ready to analyze bread! 🍞📊**
+**Ready to analyze bread! **
 

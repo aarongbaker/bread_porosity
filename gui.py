@@ -154,7 +154,7 @@ class BreadPorositytoolGUI:
         header_content = tk.Frame(header_bg, bg=self.bg_accent)
         header_content.pack(fill=tk.BOTH, expand=True, padx=25, pady=0)
         
-        title_label = tk.Label(header_content, text="🍞  Bread Porosity Analysis", 
+        title_label = tk.Label(header_content, text="  Bread Porosity Analysis", 
                                font=("Segoe UI", 20, "bold"), fg="white", bg=self.bg_accent)
         title_label.pack(anchor=tk.W, pady=(15, 5))
         
@@ -214,7 +214,7 @@ class BreadPorositytoolGUI:
         params_frame = tk.Frame(params_bg, bg=self.bg_secondary)
         params_frame.pack(fill=tk.X, padx=12, pady=12)
         
-        params_header = tk.Label(params_frame, text="⚙️  Analysis Parameters", 
+        params_header = tk.Label(params_frame, text="  Analysis Parameters", 
                                 font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
         params_header.pack(anchor=tk.W, pady=(0, 12))
         
@@ -255,7 +255,7 @@ class BreadPorositytoolGUI:
         mode_frame = tk.Frame(mode_bg, bg=self.bg_secondary)
         mode_frame.pack(fill=tk.X, padx=12, pady=12)
         
-        mode_header = tk.Label(mode_frame, text="🔍  Analysis Mode", 
+        mode_header = tk.Label(mode_frame, text="  Analysis Mode", 
                               font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
         mode_header.pack(anchor=tk.W, pady=(0, 10))
         
@@ -300,7 +300,7 @@ class BreadPorositytoolGUI:
         status_frame = tk.Frame(status_bg, bg=self.bg_secondary)
         status_frame.pack(fill=tk.X, padx=12, pady=12)
         
-        status_header = tk.Label(status_frame, text="📊  Status", 
+        status_header = tk.Label(status_frame, text="  Status", 
                                 font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
         status_header.pack(anchor=tk.W, pady=(0, 10))
         
@@ -325,7 +325,7 @@ class BreadPorositytoolGUI:
         
         # Preview tab
         preview_tab = ttk.Frame(self.notebook)
-        self.notebook.add(preview_tab, text="🖼️  Preview")
+        self.notebook.add(preview_tab, text="  Preview")
         
         preview_bg = tk.Frame(preview_tab, bg=self.bg_secondary)
         preview_bg.pack(fill=tk.BOTH, expand=True, padx=2, pady=2)
@@ -337,7 +337,7 @@ class BreadPorositytoolGUI:
         
         # Results tab
         results_tab = ttk.Frame(self.notebook)
-        self.notebook.add(results_tab, text="📈  Results")
+        self.notebook.add(results_tab, text="  Results")
         
         results_scroll = ttk.Scrollbar(results_tab)
         results_scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -351,7 +351,7 @@ class BreadPorositytoolGUI:
         
         # Metrics tab
         metrics_tab = ttk.Frame(self.notebook)
-        self.notebook.add(metrics_tab, text="📊  Metrics")
+        self.notebook.add(metrics_tab, text="  Metrics")
         
         metrics_scroll = ttk.Scrollbar(metrics_tab)
         metrics_scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -365,7 +365,7 @@ class BreadPorositytoolGUI:
         
         # Recipe Management tab
         recipe_tab = ttk.Frame(self.notebook)
-        self.notebook.add(recipe_tab, text="🍞  Recipes")
+        self.notebook.add(recipe_tab, text="  Recipes")
         
         recipe_container = ttk.Frame(recipe_tab)
         recipe_container.pack(fill=tk.BOTH, expand=True, padx=12, pady=12)
@@ -377,7 +377,7 @@ class BreadPorositytoolGUI:
         left_recipe = tk.Frame(left_recipe_bg, bg=self.bg_secondary)
         left_recipe.pack(fill=tk.BOTH, expand=True, padx=12, pady=12)
         
-        recipe_header_left = tk.Label(left_recipe, text="✏️  New Recipe", 
+        recipe_header_left = tk.Label(left_recipe, text="  New Recipe", 
                                       font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
         recipe_header_left.pack(anchor=tk.W, pady=(0, 10))
         
@@ -424,7 +424,7 @@ class BreadPorositytoolGUI:
         right_recipe = tk.Frame(right_recipe_bg, bg=self.bg_secondary)
         right_recipe.pack(fill=tk.BOTH, expand=True, padx=12, pady=12)
         
-        recipe_header_right = tk.Label(right_recipe, text="🔧  Recipe Management", 
+        recipe_header_right = tk.Label(right_recipe, text="  Recipe Management", 
                                        font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
         recipe_header_right.pack(anchor=tk.W, pady=(0, 10))
         
@@ -453,21 +453,21 @@ class BreadPorositytoolGUI:
         recipe_btn_frame = tk.Frame(right_recipe, bg=self.bg_secondary)
         recipe_btn_frame.pack(fill=tk.X)
         
-        ttk.Button(recipe_btn_frame, text="📥 Log Recipe", 
+        ttk.Button(recipe_btn_frame, text=" Log Recipe", 
                   command=self.log_new_recipe).pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(recipe_btn_frame, text="💾 Save Porosity", 
+        ttk.Button(recipe_btn_frame, text=" Save Porosity", 
                   command=self.save_recipe_porosity).pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(recipe_btn_frame, text="🔮 Predict", 
+        ttk.Button(recipe_btn_frame, text=" Predict", 
                   command=self.predict_from_recipe).pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(recipe_btn_frame, text="🔀 Create Variant", 
+        ttk.Button(recipe_btn_frame, text=" Create Variant", 
                   command=self.create_recipe_variant).pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(recipe_btn_frame, text="📋 Clone Recipe", 
+        ttk.Button(recipe_btn_frame, text=" Clone Recipe", 
                   command=self.clone_recipe).pack(fill=tk.X, pady=(0, 6))
         ttk.Button(recipe_btn_frame, text="📐 Scale Recipe", 
                   command=self.scale_recipe_gui).pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(recipe_btn_frame, text="🌳 Family Tree", 
+        ttk.Button(recipe_btn_frame, text=" Family Tree", 
                   command=self.display_recipe_family).pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(recipe_btn_frame, text="🗑️  Delete", 
+        ttk.Button(recipe_btn_frame, text="  Delete", 
                   command=self.delete_recipe).pack(fill=tk.X)
         
         # Prediction results
@@ -485,7 +485,7 @@ class BreadPorositytoolGUI:
         
         # Statistics Dashboard tab
         stats_tab = ttk.Frame(self.notebook)
-        self.notebook.add(stats_tab, text="📊  Statistics")
+        self.notebook.add(stats_tab, text="  Statistics")
         
         stats_scroll = ttk.Scrollbar(stats_tab)
         stats_scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -506,7 +506,7 @@ class BreadPorositytoolGUI:
         
         # Loaf Consistency Tracking tab
         consist_tab = ttk.Frame(self.notebook)
-        self.notebook.add(consist_tab, text="🥖  Consistency")
+        self.notebook.add(consist_tab, text="  Consistency")
         
         consist_scroll = ttk.Scrollbar(consist_tab)
         consist_scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -521,7 +521,7 @@ class BreadPorositytoolGUI:
         
         # Comparison Tools tab
         compare_tab = ttk.Frame(self.notebook)
-        self.notebook.add(compare_tab, text="⚖️  Compare")
+        self.notebook.add(compare_tab, text="  Compare")
         
         compare_scroll = ttk.Scrollbar(compare_tab)
         compare_scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -537,14 +537,14 @@ class BreadPorositytoolGUI:
         # Buttons for comparison
         compare_btn_frame = ttk.Frame(compare_tab)
         compare_btn_frame.pack(fill=tk.X, padx=12, pady=(0, 12))
-        ttk.Button(compare_btn_frame, text="📋 Compare Recipes", 
+        ttk.Button(compare_btn_frame, text=" Compare Recipes", 
                   command=self.compare_recipes).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(compare_btn_frame, text="🔍 What-If Analysis", 
+        ttk.Button(compare_btn_frame, text=" What-If Analysis", 
                   command=self.what_if_analysis).pack(side=tk.LEFT)
         
         # Export & Reporting tab
         export_tab = ttk.Frame(self.notebook)
-        self.notebook.add(export_tab, text="💾  Export")
+        self.notebook.add(export_tab, text="  Export")
         
         export_container = ttk.Frame(export_tab)
         export_container.pack(fill=tk.BOTH, expand=True, padx=12, pady=12)
@@ -556,13 +556,13 @@ class BreadPorositytoolGUI:
         export_options_frame = tk.Frame(export_options_bg, bg=self.bg_secondary)
         export_options_frame.pack(fill=tk.X, padx=12, pady=12)
         
-        export_header = tk.Label(export_options_frame, text="📋  Export Format", 
+        export_header = tk.Label(export_options_frame, text="  Export Format", 
                                 font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
         export_header.pack(anchor=tk.W, pady=(0, 10))
         
-        ttk.Button(export_options_frame, text="📊 Export to CSV", 
+        ttk.Button(export_options_frame, text=" Export to CSV", 
                   command=self.export_batch_csv).pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(export_options_frame, text="📈 Export to Excel", 
+        ttk.Button(export_options_frame, text=" Export to Excel", 
                   command=self.export_batch_excel).pack(fill=tk.X, pady=(0, 6))
         ttk.Button(export_options_frame, text="📄 Generate PDF Report", 
                   command=self.export_batch_pdf).pack(fill=tk.X, pady=(0, 6))
@@ -583,7 +583,7 @@ class BreadPorositytoolGUI:
         
         # Quality Control tab
         qc_tab = ttk.Frame(self.notebook)
-        self.notebook.add(qc_tab, text="✓  Quality Control")
+        self.notebook.add(qc_tab, text="  Quality Control")
         
         qc_container = ttk.Frame(qc_tab)
         qc_container.pack(fill=tk.BOTH, expand=True, padx=12, pady=12)
@@ -595,7 +595,7 @@ class BreadPorositytoolGUI:
         bread_type_frame = tk.Frame(bread_type_bg, bg=self.bg_secondary)
         bread_type_frame.pack(fill=tk.X, padx=12, pady=12)
         
-        bread_header = tk.Label(bread_type_frame, text="🍞  Bread Type Profile", 
+        bread_header = tk.Label(bread_type_frame, text="  Bread Type Profile", 
                                font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
         bread_header.pack(anchor=tk.W, pady=(0, 10))
         
@@ -614,9 +614,9 @@ class BreadPorositytoolGUI:
         self.bread_type_combo.pack(side=tk.LEFT, padx=(0, 10))
         self.bread_type_combo.bind("<<ComboboxSelected>>", self._on_bread_type_change)
         
-        ttk.Button(bread_selector_row, text="👁️  View Profile", 
+        ttk.Button(bread_selector_row, text="  View Profile", 
                   command=self.qc_view_bread_profile).pack(side=tk.LEFT, padx=(0, 6))
-        ttk.Button(bread_selector_row, text="✏️  Edit Profile", 
+        ttk.Button(bread_selector_row, text="  Edit Profile", 
                   command=self.qc_edit_bread_profile).pack(side=tk.LEFT)
         
         # QC Controls frame
@@ -626,19 +626,19 @@ class BreadPorositytoolGUI:
         qc_controls_frame = tk.Frame(qc_controls_bg, bg=self.bg_secondary)
         qc_controls_frame.pack(fill=tk.X, padx=12, pady=12)
         
-        qc_controls_header = tk.Label(qc_controls_frame, text="🔍  Quality Control Tools", 
+        qc_controls_header = tk.Label(qc_controls_frame, text="  Quality Control Tools", 
                                       font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
         qc_controls_header.pack(anchor=tk.W, pady=(0, 10))
         
-        ttk.Button(qc_controls_frame, text="✓ Evaluate Current Analysis", 
+        ttk.Button(qc_controls_frame, text=" Evaluate Current Analysis", 
                   command=self.qc_evaluate_current).pack(fill=tk.X, pady=(0, 6))
         ttk.Button(qc_controls_frame, text="📦 Check Batch Consistency", 
                   command=self.qc_batch_consistency).pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(qc_controls_frame, text="📊 SPC Statistics", 
+        ttk.Button(qc_controls_frame, text=" SPC Statistics", 
                   command=self.qc_spc_statistics).pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(qc_controls_frame, text="⚠️  View Alerts", 
+        ttk.Button(qc_controls_frame, text="⚠  View Alerts", 
                   command=self.qc_view_alerts).pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(qc_controls_frame, text="⚙️  Configure Thresholds", 
+        ttk.Button(qc_controls_frame, text="  Configure Thresholds", 
                   command=self.qc_configure_thresholds).pack(fill=tk.X)
         
         # QC Results display
@@ -743,7 +743,7 @@ class BreadPorositytoolGUI:
             destination = self.processed_dir / self.current_image_path.name
             shutil.move(str(self.current_image_path), str(destination))
             
-            self.set_status("✓ Analysis complete!", color=self.success_color)
+            self.set_status(" Analysis complete!", color=self.success_color)
             self.refresh_image_list()
             
             porosity = result['metrics']['porosity_percent']
@@ -779,7 +779,7 @@ class BreadPorositytoolGUI:
                 self.analysis_result = result
                 self.display_loaf_results(result)
                 
-                self.set_status(f"✓ Loaf analysis complete!", color=self.success_color)
+                self.set_status(f" Loaf analysis complete!", color=self.success_color)
                 
                 mean_porosity = result['porosity']['mean']
                 num_slices = result['num_slices']
@@ -1023,7 +1023,7 @@ SLICE-BY-SLICE
             )
             
             self.refresh_recipe_list()
-            self.set_status(f"✓ Recipe logged: {recipe['name']}", self.success_color)
+            self.set_status(f" Recipe logged: {recipe['name']}", self.success_color)
             messagebox.showinfo("Success", f"Recipe '{recipe['name']}' saved!\n\nRecipe ID: {recipe['id']}\n\nNow analyze an image and save the porosity result.")
         
         except json.JSONDecodeError as e:
@@ -1056,7 +1056,7 @@ SLICE-BY-SLICE
         
         if variant:
             self.refresh_recipe_list()
-            self.set_status(f"✓ Variant created: {variant_name}", self.success_color)
+            self.set_status(f" Variant created: {variant_name}", self.success_color)
             messagebox.showinfo("Success", f"Variant '{variant_name}' created from '{parent['name']}'")
         else:
             messagebox.showerror("Error", "Could not create variant")
@@ -1106,7 +1106,7 @@ SLICE-BY-SLICE
         
         self.prediction_text.delete("1.0", tk.END)
         self.prediction_text.insert("1.0", output)
-        self.set_status("✓ Recipe family displayed", self.success_color)
+        self.set_status(" Recipe family displayed", self.success_color)
 
     def save_recipe_porosity(self):
         """Save measured porosity to the selected recipe"""
@@ -1131,7 +1131,7 @@ SLICE-BY-SLICE
             self.recipe_predictor = RecipePredictor(self.recipe_db.get_recipes_with_porosity())
             
             self.refresh_recipe_list()
-            self.set_status(f"✓ Porosity saved: {porosity:.2f}%", self.success_color)
+            self.set_status(f" Porosity saved: {porosity:.2f}%", self.success_color)
             messagebox.showinfo("Success", f"Porosity {porosity:.2f}% saved to recipe!\n\nRecipe now has training data for predictions.")
         else:
             messagebox.showerror("Error", "Could not save porosity to recipe")
@@ -1177,7 +1177,7 @@ FEATURE CONTRIBUTIONS:
         self.prediction_text.delete(1.0, tk.END)
         self.prediction_text.insert(1.0, result_text)
         
-        self.set_status(f"✓ Prediction: {predicted_porosity:.1f}%", self.success_color)
+        self.set_status(f" Prediction: {predicted_porosity:.1f}%", self.success_color)
     
     def delete_recipe(self):
         """Delete the selected recipe"""
@@ -1193,7 +1193,7 @@ FEATURE CONTRIBUTIONS:
             self.recipe_db.delete_recipe(self.current_recipe_id)
             self.current_recipe_id = None
             self.refresh_recipe_list()
-            self.set_status("✓ Recipe deleted", self.success_color)
+            self.set_status(" Recipe deleted", self.success_color)
     
     def clone_recipe(self):
         """Clone the selected recipe"""
@@ -1217,7 +1217,7 @@ FEATURE CONTRIBUTIONS:
             cloned = self.recipe_db.clone_recipe(self.current_recipe_id, clone_name if clone_name else None)
             if cloned:
                 self.refresh_recipe_list()
-                self.set_status(f"✓ Recipe cloned: {cloned['name']}", self.success_color)
+                self.set_status(f" Recipe cloned: {cloned['name']}", self.success_color)
                 messagebox.showinfo("Success", f"Recipe cloned as '{cloned['name']}'\n\nID: {cloned['id']}")
             else:
                 messagebox.showerror("Error", "Could not clone recipe")
@@ -1284,7 +1284,7 @@ FEATURE CONTRIBUTIONS:
                 self.prediction_text.delete("1.0", tk.END)
                 self.prediction_text.insert("1.0", output)
                 
-                self.set_status(f"✓ Recipe scaled: {scaled['name']}", self.success_color)
+                self.set_status(f" Recipe scaled: {scaled['name']}", self.success_color)
                 messagebox.showinfo("Success", f"Recipe scaled and saved as '{scaled['name']}'")
             else:
                 messagebox.showerror("Error", "Could not scale recipe")
@@ -1363,7 +1363,7 @@ FEATURE CONTRIBUTIONS:
             output += "\n(*** p<0.05 = significant, ** p<0.1 = marginally significant)\n"
             
             self.stats_text.insert("1.0", output)
-            self.set_status("✓ Statistics dashboard refreshed", self.success_color)
+            self.set_status(" Statistics dashboard refreshed", self.success_color)
             
         except Exception as e:
             output = f"Error generating statistics dashboard:\n\n{str(e)}\n\n{traceback.format_exc()}"
@@ -1411,7 +1411,7 @@ FEATURE CONTRIBUTIONS:
         self.compare_text.delete("1.0", tk.END)
         self.compare_text.insert("1.0", output)
         self.notebook.select(5)  # Switch to comparison tab
-        self.set_status("✓ Recipes compared", self.success_color)
+        self.set_status(" Recipes compared", self.success_color)
     
     def what_if_analysis(self):
         """Perform what-if analysis on recipe modifications"""
@@ -1468,7 +1468,7 @@ FEATURE CONTRIBUTIONS:
         self.compare_text.delete("1.0", tk.END)
         self.compare_text.insert("1.0", output)
         self.notebook.select(5)  # Switch to comparison tab
-        self.set_status("✓ What-if analysis complete", self.success_color)
+        self.set_status(" What-if analysis complete", self.success_color)
     
     def display_loaf_consistency(self):
         """Display loaf consistency analysis for multi-slice data"""
@@ -1589,7 +1589,7 @@ FEATURE CONTRIBUTIONS:
         for key, display_name in bread_types.items():
             if display_name == selected_display_name:
                 self.qc_manager.set_bread_type(key)
-                self.set_status(f"✓ Switched to {display_name} profile", self.success_color)
+                self.set_status(f" Switched to {display_name} profile", self.success_color)
                 break
     
     def qc_view_bread_profile(self):
@@ -1626,7 +1626,7 @@ FEATURE CONTRIBUTIONS:
         
         self.qc_text.delete(1.0, tk.END)
         self.qc_text.insert(1.0, output)
-        self.set_status(f"✓ Profile displayed: {profile.get('display_name', bread_type)}", self.success_color)
+        self.set_status(f" Profile displayed: {profile.get('display_name', bread_type)}", self.success_color)
     
     def qc_edit_bread_profile(self):
         """Edit the current bread type profile"""
@@ -1724,12 +1724,12 @@ Edit values above (format: key: value)
                 filename=f"batch_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
             )
             
-            result_msg = f"✅ CSV export successful!\n\nFile: {output_path.name}\n\nLocation: {self.output_dir}"
+            result_msg = f" CSV export successful!\n\nFile: {output_path.name}\n\nLocation: {self.output_dir}"
             self.export_text.delete(1.0, tk.END)
             self.export_text.insert(1.0, result_msg)
             
             messagebox.showinfo("Export Complete", result_msg)
-            self.set_status(f"✓ CSV exported: {output_path.name}", self.success_color)
+            self.set_status(f" CSV exported: {output_path.name}", self.success_color)
         
         except Exception as e:
             error_msg = f"CSV export failed:\n\n{str(e)}"
@@ -1751,12 +1751,12 @@ Edit values above (format: key: value)
             )
             
             if output_path:
-                result_msg = f"✅ Excel export successful!\n\nFile: {output_path.name}\n\nLocation: {self.output_dir}\n\nFeatures:\n• Summary sheet with statistics\n• Detailed results sheet\n• Analysis data"
+                result_msg = f" Excel export successful!\n\nFile: {output_path.name}\n\nLocation: {self.output_dir}\n\nFeatures:\n• Summary sheet with statistics\n• Detailed results sheet\n• Analysis data"
                 self.export_text.delete(1.0, tk.END)
                 self.export_text.insert(1.0, result_msg)
                 
                 messagebox.showinfo("Export Complete", result_msg)
-                self.set_status(f"✓ Excel exported: {output_path.name}", self.success_color)
+                self.set_status(f" Excel exported: {output_path.name}", self.success_color)
             else:
                 messagebox.showwarning("Export", "Excel export not available. Install openpyxl:\npip install openpyxl")
         
@@ -1781,12 +1781,12 @@ Edit values above (format: key: value)
             )
             
             if output_path:
-                result_msg = f"✅ PDF report generated successfully!\n\nFile: {output_path.name}\n\nLocation: {self.output_dir}\n\nReport includes:\n• Summary statistics\n• Detailed results table\n• Analysis information"
+                result_msg = f" PDF report generated successfully!\n\nFile: {output_path.name}\n\nLocation: {self.output_dir}\n\nReport includes:\n• Summary statistics\n• Detailed results table\n• Analysis information"
                 self.export_text.delete(1.0, tk.END)
                 self.export_text.insert(1.0, result_msg)
                 
                 messagebox.showinfo("Export Complete", result_msg)
-                self.set_status(f"✓ PDF report generated: {output_path.name}", self.success_color)
+                self.set_status(f" PDF report generated: {output_path.name}", self.success_color)
             else:
                 messagebox.showwarning("Export", "PDF export not available. Install reportlab:\npip install reportlab")
         
@@ -1807,7 +1807,7 @@ Edit values above (format: key: value)
             chart_paths = self.export_engine.create_summary_charts(self.analysis_history)
             
             if chart_paths:
-                result_msg = "✅ Summary charts created!\n\n"
+                result_msg = " Summary charts created!\n\n"
                 result_msg += "Charts generated:\n"
                 for chart_name, path in chart_paths.items():
                     result_msg += f"  • {chart_name}: {path.name}\n"
@@ -1817,7 +1817,7 @@ Edit values above (format: key: value)
                 self.export_text.insert(1.0, result_msg)
                 
                 messagebox.showinfo("Charts Created", result_msg)
-                self.set_status(f"✓ {len(chart_paths)} charts created", self.success_color)
+                self.set_status(f" {len(chart_paths)} charts created", self.success_color)
             else:
                 messagebox.showwarning("Charts", "No charts were created")
         
@@ -1852,10 +1852,10 @@ Edit values above (format: key: value)
             output += "ACCEPTANCE STATUS:\n"
             output += "-" * 70 + "\n"
             acceptance = evaluation['acceptance']
-            output += f"  Porosity:    {'✅ PASS' if acceptance['porosity_ok'] else '❌ FAIL'}\n"
-            output += f"  Holes:       {'✅ PASS' if acceptance['holes_ok'] else '❌ FAIL'}\n"
-            output += f"  Uniformity:  {'✅ PASS' if acceptance['uniformity_ok'] else '❌ FAIL'}\n"
-            output += f"  OVERALL:     {'✅ ACCEPT' if acceptance['overall_ok'] else '⚠️  REVIEW NEEDED'}\n\n"
+            output += f"  Porosity:    {' PASS' if acceptance['porosity_ok'] else ' FAIL'}\n"
+            output += f"  Holes:       {' PASS' if acceptance['holes_ok'] else ' FAIL'}\n"
+            output += f"  Uniformity:  {' PASS' if acceptance['uniformity_ok'] else ' FAIL'}\n"
+            output += f"  OVERALL:     {' ACCEPT' if acceptance['overall_ok'] else '⚠  REVIEW NEEDED'}\n\n"
             
             output += f"QUALITY GRADE: {evaluation['grade']}\n\n"
             
@@ -1869,7 +1869,7 @@ Edit values above (format: key: value)
             
             # Alerts
             if evaluation['alerts']:
-                output += "⚠️  ALERTS:\n"
+                output += "⚠  ALERTS:\n"
                 output += "-" * 70 + "\n"
                 for alert in evaluation['alerts']:
                     output += f"  {alert}\n"
@@ -1885,7 +1885,7 @@ Edit values above (format: key: value)
             self.qc_text.delete(1.0, tk.END)
             self.qc_text.insert(1.0, output)
             
-            self.set_status(f"✓ QC evaluation complete: {evaluation['grade']}", self.success_color)
+            self.set_status(f" QC evaluation complete: {evaluation['grade']}", self.success_color)
         
         except Exception as e:
             error_msg = f"QC evaluation failed:\n\n{str(e)}"
@@ -1934,7 +1934,7 @@ Edit values above (format: key: value)
             self.qc_text.delete(1.0, tk.END)
             self.qc_text.insert(1.0, output)
             
-            verdict = "✓" if report.get('is_consistent') else "⚠️"
+            verdict = "" if report.get('is_consistent') else "⚠"
             self.set_status(f"{verdict} Batch consistency check complete", self.success_color)
         
         except Exception as e:
@@ -1978,7 +1978,7 @@ Edit values above (format: key: value)
             self.qc_text.delete(1.0, tk.END)
             self.qc_text.insert(1.0, output)
             
-            self.set_status("✓ SPC statistics displayed", self.success_color)
+            self.set_status(" SPC statistics displayed", self.success_color)
         
         except Exception as e:
             error_msg = f"SPC calculation failed:\n\n{str(e)}"
@@ -2000,12 +2000,12 @@ Edit values above (format: key: value)
                 for i, alert in enumerate(alerts, 1):
                     output += f"{i}. {alert}\n"
             else:
-                output += "✅ No active alerts\n"
+                output += " No active alerts\n"
             
             self.qc_text.delete(1.0, tk.END)
             self.qc_text.insert(1.0, output)
             
-            status_msg = f"✓ Viewing {len(alerts)} alerts"
+            status_msg = f" Viewing {len(alerts)} alerts"
             self.set_status(status_msg, self.success_color)
         
         except Exception as e:
@@ -2055,7 +2055,7 @@ Edit values above (format: key: value)
             self.qc_manager.save_config()
             
             messagebox.showinfo("Success", "QC configuration saved!")
-            self.set_status("✓ QC thresholds updated", self.success_color)
+            self.set_status(" QC thresholds updated", self.success_color)
             window.destroy()
         
         except json.JSONDecodeError as e:

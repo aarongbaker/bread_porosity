@@ -131,14 +131,14 @@ python gui.py
 
 ## Tips
 
-✅ **DO:**
+**DO:**
 - Use consistent lighting for images
 - Calibrate pixel size accurately
 - Log environmental conditions (temperature, humidity)
 - Analyze multiple slices per loaf
 - Test changes one at a time
 
-❌ **DON'T:**
+**DON'T:**
 - Assume cooking times scale with recipes
 - Test multiple changes simultaneously
 - Skip calibration
@@ -220,13 +220,13 @@ A: Predictions improve with more recipes; log 5-10 recipes for better accuracy
 
 ## Next Steps
 
-1. ✅ Run setup calibration
-2. ✅ Analyze sample images
-3. ✅ Log 3-5 recipes with measured porosity
-4. ✅ Check Statistics Dashboard
-5. ✅ Use What-If to test scenarios
-6. ✅ Create and test recipe variants
-7. ✅ Compare results
+1. Run setup calibration
+2. Analyze sample images
+3. Log 3-5 recipes with measured porosity
+4. Check Statistics Dashboard
+5. Use What-If to test scenarios
+6. Create and test recipe variants
+7. Compare results
 
 ---
 

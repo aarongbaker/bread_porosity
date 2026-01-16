@@ -9,7 +9,7 @@
 
 ---
 
-## 🍎 macOS Installation
+## macOS Installation
 
 ### Step 1: Install Python & Dependencies
 
@@ -51,10 +51,10 @@ pip install -r requirements.txt
 
 Verify installation:
 ```bash
-python -c "import cv2, numpy, matplotlib, scipy; print('✓ All packages installed')"
+python -c "import cv2, numpy, matplotlib, scipy; print('All packages installed')"
 ```
 
-Expected output: `✓ All packages installed`
+Expected output: `All packages installed`
 
 ### Step 5: Run GUI
 
@@ -62,11 +62,11 @@ Expected output: `✓ All packages installed`
 python gui.py
 ```
 
-The GUI should launch with the modern dark theme! 🎨
+The GUI should launch with the modern dark theme!
 
 ---
 
-## 🪟 Windows Installation
+## Windows Installation
 
 ### Step 1: Install Python
 
@@ -112,10 +112,10 @@ pip install -r requirements.txt
 
 Verify installation:
 ```powershell
-python -c "import cv2, numpy, matplotlib, scipy; print('✓ All packages installed')"
+python -c "import cv2, numpy, matplotlib, scipy; print('All packages installed')"
 ```
 
-Expected output: `✓ All packages installed`
+Expected output: `All packages installed`
 
 ### Step 5: Run GUI
 
@@ -123,11 +123,11 @@ Expected output: `✓ All packages installed`
 python gui.py
 ```
 
-The GUI should launch with the modern dark theme! 🎨
+The GUI should launch with the modern dark theme!
 
 ---
 
-## 🐧 Linux Installation
+## Linux Installation
 
 ### Step 1: Install Python & Dependencies
 
@@ -170,10 +170,10 @@ pip install -r requirements.txt
 
 Verify installation:
 ```bash
-python -c "import cv2, numpy, matplotlib, scipy; print('✓ All packages installed')"
+python -c "import cv2, numpy, matplotlib, scipy; print('All packages installed')"
 ```
 
-Expected output: `✓ All packages installed`
+Expected output: `All packages installed`
 
 ### Step 5: Run GUI
 
@@ -181,11 +181,11 @@ Expected output: `✓ All packages installed`
 python gui.py
 ```
 
-The GUI should launch with the modern dark theme! 🎨
+The GUI should launch with the modern dark theme!
 
 ---
 
-## ✅ Verify Tool Structure
+##  Verify Tool Structure
 
 Check that all files exist:
 
@@ -193,7 +193,7 @@ Check that all files exist:
 ```bash
 files=("__init__.py" "gui.py" "analyze.py" "quality_control.py" "export_reporting.py" "requirements.txt" "README.md")
 for file in "${files[@]}"; do
-    if [ -f "$file" ]; then echo "✓ $file"; else echo "✗ MISSING: $file"; fi
+    if [ -f "$file" ]; then echo "$file"; else echo "MISSING: $file"; fi
 done
 ```
 
@@ -209,16 +209,16 @@ $files = @(
     "README.md"
 )
 foreach ($file in $files) {
-    if (Test-Path $file) { Write-Host "✓ $file" } 
+    if (Test-Path $file) { Write-Host "$file" } 
     else { Write-Host "✗ MISSING: $file" }
 }
 ```
 
-Expected: All files should show ✓
+Expected: All files should show present
 
 ---
 
-## 🧪 Test Import
+##  Test Import
 
 ### macOS/Linux
 ```bash
@@ -226,7 +226,7 @@ python -c "
 from gui import BreadPorositytoolGUI
 from quality_control import QualityControlManager
 from export_reporting import ExportEngine
-print('✓ All modules import successfully')
+print('All modules import successfully')
 "
 ```
 
@@ -236,15 +236,15 @@ python -c "
 from gui import BreadPorositytoolGUI
 from quality_control import QualityControlManager
 from export_reporting import ExportEngine
-print('✓ All modules import successfully')
+print('All modules import successfully')
 "
 ```
 
-Expected output: `✓ All modules import successfully`
+Expected output: `All modules import successfully`
 
 ---
 
-## 🔧 Troubleshooting Installation
+## Troubleshooting Installation
 
 ### Issue: "No module named cv2"
 ```bash
@@ -307,17 +307,17 @@ cd C:\Users\YourUsername\Desktop\bread_porosity
 
 ---
 
-## 🚀 Quick Start After Installation
+##  Quick Start After Installation
 
 1. **Launch GUI**: `python gui.py`
 2. **Load Image**: Click "📂 Open Folder"
 3. **Select Image**: Choose a bread slice image
 4. **Analyze**: Click "▶ Analyze"
-5. **View Results**: Check "📈 Results" tab
+5. **View Results**: Check " Results" tab
 
 ---
 
-## 📋 System Requirements
+##  System Requirements
 
 | Component | Minimum | Recommended |
 |-----------|---------|-------------|
@@ -338,4 +338,4 @@ cd C:\Users\YourUsername\Desktop\bread_porosity
 
 ---
 
-**Installation complete! Ready to analyze bread! 🍞📊**
+**Installation complete! Ready to analyze bread! **
