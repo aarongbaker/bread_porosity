@@ -3,8 +3,6 @@
 BREAD POROSITY ANALYSIS TOOL - Project Overview
 ================================================
 
-Location: c:\Users\abaker\OneDrive - Factory Direct of Edison\Desktop\test\bread_porosity\
-
 A complete Python tool for measuring bread crumb structure using transmitted light 
 and image processing. No machine learning - classical computer vision methods proven
 to work reliably with proper setup.

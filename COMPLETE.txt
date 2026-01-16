@@ -3,8 +3,6 @@
 📦 DELIVERABLES SUMMARY
 =======================
 
-Location: c:\Users\abaker\OneDrive - Factory Direct of Edison\Desktop\test\bread_porosity\
-
 Total Files: 18
 Total Size: ~120 KB
 Documentation: 14,000+ words
@@ -375,8 +373,6 @@ NEXT STEPS
 ═══════════════════════════════════════════════════════════════
 
 🎉 YOUR BREAD POROSITY ANALYSIS TOOL IS READY! 🍞
-
-Location: c:\Users\abaker\OneDrive - Factory Direct of Edison\Desktop\test\bread_porosity\
 
 Start: READ INDEX.md or START_HERE.md
 
