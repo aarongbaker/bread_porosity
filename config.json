@@ -1,0 +1,34 @@
+{
+  "imaging": {
+    "camera_setup": {
+      "backlit": true,
+      "fixed_distance_mm": 150,
+      "locked_exposure": true,
+      "iso": "auto",
+      "aperture": "f/5.6"
+    }
+  },
+  "processing": {
+    "normalization_method": "clahe",
+    "threshold_method": "otsu",
+    "pixel_size_mm": 0.1,
+    "morphology": {
+      "remove_small_holes_pixels": 50,
+      "fill_small_gaps_pixels": 50
+    }
+  },
+  "metrics": {
+    "compute_porosity": true,
+    "compute_hole_metrics": true,
+    "compute_anisotropy": true,
+    "compute_uniformity": true
+  },
+  "output": {
+    "save_comparison_image": true,
+    "save_hole_distribution": true,
+    "save_annotated_image": true,
+    "save_metrics_json": true,
+    "output_format": "jpg",
+    "compression_quality": 95
+  }
+}

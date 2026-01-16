@@ -1,0 +1,84 @@
+{
+  "imaging_setup": {
+    "description": "Bread porosity analysis configuration template",
+    "camera": {
+      "model": "iPhone 13 (example)",
+      "lens_type": "wide",
+      "megapixels": 12,
+      "sensor_size_mm": "25",
+      "notes": "Document your camera model for reference"
+    },
+    "lighting": {
+      "type": "backlit_tablet",
+      "brightness": "maximum white",
+      "diffuser": "frosted_acrylic",
+      "distance_cm": 30,
+      "uniformity_target": 70,
+      "notes": "Setup should pass uniformity check before use"
+    },
+    "camera_positioning": {
+      "distance_cm": 15,
+      "angle_degrees": 0,
+      "mounting": "tripod",
+      "focal_length_notes": "Use macro if available, lock focus"
+    },
+    "image_settings": {
+      "mode": "manual",
+      "exposure": "locked",
+      "white_balance": "daylight",
+      "iso": 100,
+      "resolution": "maximum",
+      "format": "jpg_or_png"
+    },
+    "sample_preparation": {
+      "bread_type": "your_bread_type",
+      "slice_thickness_mm": 5,
+      "placement": "direct_contact_with_diffuser",
+      "reference_patch": {
+        "included": true,
+        "type": "gray_card",
+        "placement": "edge_of_frame"
+      }
+    }
+  },
+  "processing_parameters": {
+    "pixel_calibration": {
+      "pixel_size_mm": 0.10,
+      "method": "direct_measurement",
+      "notes": "Adjust based on camera distance and lens"
+    },
+    "normalization": {
+      "method": "clahe",
+      "alternatives": ["morphology", "gaussian"],
+      "notes": "CLAHE works well for most bread types"
+    },
+    "threshold": {
+      "method": "otsu",
+      "alternatives": ["adaptive"],
+      "notes": "Otsu with uniform lighting, adaptive for varied"
+    },
+    "morphological_cleanup": {
+      "remove_small_holes_pixels": 50,
+      "fill_small_gaps_pixels": 50,
+      "notes": "Increase for noisier images, decrease for fine holes"
+    }
+  },
+  "quality_control": {
+    "sharpness_minimum": 500,
+    "uniformity_minimum": 70,
+    "repeatability_target": "within 5%",
+    "validation_method": "measure_same_sample_3x"
+  },
+  "batch_analysis": {
+    "enabled": true,
+    "image_directory": "bread_samples/",
+    "output_directory": "results/",
+    "generate_summary": true
+  },
+  "metadata": {
+    "laboratory": "your_lab_name",
+    "analyst": "your_name",
+    "date_calibrated": "2024-01-15",
+    "notes": "Keep this file for future reference and validation"
+  }
+}

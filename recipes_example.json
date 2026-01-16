@@ -1,0 +1,119 @@
+[
+  {
+    "id": 1,
+    "name": "Classic Sourdough",
+    "created_at": "2026-01-10T08:00:00",
+    "ingredients": {
+      "bread flour": 500,
+      "water": 325,
+      "salt": 10,
+      "sourdough starter": 100
+    },
+    "mixing_time_min": 10,
+    "proof_time_min": 480,
+    "oven_temp_c": 450,
+    "cooking_vessel": "dutch oven",
+    "cook_time_min": 40,
+    "measured_porosity": 28.5,
+    "porosity_measured_at": "2026-01-10T14:30:00",
+    "notes": "75% hydration, overnight fermentation, good oven spring"
+  },
+  {
+    "id": 2,
+    "name": "High Hydration Sourdough",
+    "created_at": "2026-01-11T08:00:00",
+    "ingredients": {
+      "bread flour": 500,
+      "water": 380,
+      "salt": 10,
+      "sourdough starter": 100
+    },
+    "mixing_time_min": 15,
+    "proof_time_min": 540,
+    "oven_temp_c": 460,
+    "cooking_vessel": "dutch oven",
+    "cook_time_min": 38,
+    "measured_porosity": 32.1,
+    "porosity_measured_at": "2026-01-11T14:45:00",
+    "notes": "76% hydration, extra water increased hole size significantly"
+  },
+  {
+    "id": 3,
+    "name": "Low Hydration Sourdough",
+    "created_at": "2026-01-12T08:00:00",
+    "ingredients": {
+      "bread flour": 500,
+      "water": 280,
+      "salt": 10,
+      "sourdough starter": 100
+    },
+    "mixing_time_min": 8,
+    "proof_time_min": 420,
+    "oven_temp_c": 440,
+    "cooking_vessel": "dutch oven",
+    "cook_time_min": 42,
+    "measured_porosity": 22.3,
+    "porosity_measured_at": "2026-01-12T14:15:00",
+    "notes": "56% hydration, stiffer dough, smaller holes but more uniform"
+  },
+  {
+    "id": 4,
+    "name": "Extended Proof Sourdough",
+    "created_at": "2026-01-13T08:00:00",
+    "ingredients": {
+      "bread flour": 500,
+      "water": 325,
+      "salt": 10,
+      "sourdough starter": 100
+    },
+    "mixing_time_min": 10,
+    "proof_time_min": 720,
+    "oven_temp_c": 450,
+    "cooking_vessel": "dutch oven",
+    "cook_time_min": 40,
+    "measured_porosity": 30.8,
+    "porosity_measured_at": "2026-01-13T16:00:00",
+    "notes": "24-hour fermentation (12h cold + 12h room temp), excellent flavor and open crumb"
+  },
+  {
+    "id": 5,
+    "name": "Quick Sourdough",
+    "created_at": "2026-01-14T08:00:00",
+    "ingredients": {
+      "bread flour": 500,
+      "water": 325,
+      "salt": 10,
+      "sourdough starter": 150
+    },
+    "mixing_time_min": 10,
+    "proof_time_min": 240,
+    "oven_temp_c": 470,
+    "cooking_vessel": "dutch oven",
+    "cook_time_min": 36,
+    "measured_porosity": 24.2,
+    "porosity_measured_at": "2026-01-14T13:30:00",
+    "notes": "Higher starter ratio for faster fermentation, shorter bulk ferment"
+  },
+  {
+    "id": 6,
+    "name": "Sandwich Bread",
+    "created_at": "2026-01-14T10:00:00",
+    "ingredients": {
+      "bread flour": 500,
+      "water": 280,
+      "salt": 10,
+      "sugar": 25,
+      "butter": 20,
+      "milk": 50,
+      "commercial yeast": 5
+    },
+    "mixing_time_min": 20,
+    "proof_time_min": 120,
+    "oven_temp_c": 400,
+    "cooking_vessel": "loaf pan",
+    "cook_time_min": 45,
+    "measured_porosity": 18.5,
+    "porosity_measured_at": "2026-01-14T15:00:00",
+    "notes": "Commercial yeast, short fermentation, soft crumb for slicing"
+  }
+]
