@@ -2,14 +2,111 @@
 
 ## Before You Start
 
-- [ ] Python 3.8+ installed (`python --version`)
-- [ ] Windows/Mac/Linux OS confirmed
+- [ ] Python 3.9+ installed (`python --version`)
+- [ ] Windows, macOS, or Linux OS confirmed
 - [ ] Sample bread images available (JPG or PNG)
+- [ ] Terminal/Command Prompt access
 
-## Step 1: Install Dependencies
+---
+
+## 🍎 macOS Installation
+
+### Step 1: Install Python & Dependencies
+
+```bash
+# Install Homebrew (if not already installed)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install Python 3.9+
+brew install python@3.9
+
+# Verify Python installation
+python3 --version
+```
+
+### Step 2: Clone/Navigate to Project
+
+```bash
+cd ~/Desktop/bread_porosity
+```
+
+### Step 3: Create Virtual Environment (Recommended)
+
+```bash
+# Create virtual environment
+python3 -m venv venv
+
+# Activate virtual environment
+source venv/bin/activate
+
+# Verify activation (you should see (venv) in your prompt)
+```
+
+### Step 4: Install Dependencies
+
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+Verify installation:
+```bash
+python -c "import cv2, numpy, matplotlib, scipy; print('✓ All packages installed')"
+```
+
+Expected output: `✓ All packages installed`
+
+### Step 5: Run GUI
+
+```bash
+python gui.py
+```
+
+The GUI should launch with the modern dark theme! 🎨
+
+---
+
+## 🪟 Windows Installation
+
+### Step 1: Install Python
+
+1. Download Python 3.9+ from [python.org](https://www.python.org/downloads/)
+2. **Important**: Check "Add Python to PATH" during installation
+3. Click "Install Now"
+4. Verify installation:
 
 ```powershell
-cd c:\Users\abaker\OneDrive - Factory Direct of Edison\Desktop\test\bread_porosity
+python --version
+```
+
+### Step 2: Navigate to Project
+
+```powershell
+cd C:\Users\YourUsername\Desktop\bread_porosity
+```
+
+### Step 3: Create Virtual Environment (Recommended)
+
+```powershell
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+.\venv\Scripts\Activate.ps1
+
+# If you get execution policy error, run:
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# Then try activation again
+.\venv\Scripts\Activate.ps1
+
+# Verify activation (you should see (venv) in your prompt)
+```
+
+### Step 4: Install Dependencies
+
+```powershell
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
@@ -20,23 +117,96 @@ python -c "import cv2, numpy, matplotlib, scipy; print('✓ All packages install
 
 Expected output: `✓ All packages installed`
 
-## Step 2: Verify Tool Structure
+### Step 5: Run GUI
+
+```powershell
+python gui.py
+```
+
+The GUI should launch with the modern dark theme! 🎨
+
+---
+
+## 🐧 Linux Installation
+
+### Step 1: Install Python & Dependencies
+
+```bash
+# Ubuntu/Debian
+sudo apt-get update
+sudo apt-get install python3.9 python3-pip python3-venv
+
+# Or for Fedora/RHEL
+sudo dnf install python3.9 python3-pip
+
+# Verify installation
+python3 --version
+```
+
+### Step 2: Navigate to Project
+
+```bash
+cd ~/Desktop/bread_porosity
+```
+
+### Step 3: Create Virtual Environment (Recommended)
+
+```bash
+# Create virtual environment
+python3 -m venv venv
+
+# Activate virtual environment
+source venv/bin/activate
+
+# Verify activation (you should see (venv) in your prompt)
+```
+
+### Step 4: Install Dependencies
+
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+Verify installation:
+```bash
+python -c "import cv2, numpy, matplotlib, scipy; print('✓ All packages installed')"
+```
+
+Expected output: `✓ All packages installed`
+
+### Step 5: Run GUI
+
+```bash
+python gui.py
+```
+
+The GUI should launch with the modern dark theme! 🎨
+
+---
+
+## ✅ Verify Tool Structure
 
 Check that all files exist:
 
+### macOS/Linux
+```bash
+files=("__init__.py" "gui.py" "analyze.py" "quality_control.py" "export_reporting.py" "requirements.txt" "README.md")
+for file in "${files[@]}"; do
+    if [ -f "$file" ]; then echo "✓ $file"; else echo "✗ MISSING: $file"; fi
+done
+```
+
+### Windows
 ```powershell
 $files = @(
     "__init__.py",
-    "imaging_pipeline.py",
-    "metrics.py",
-    "visualization.py",
-    "calibration.py",
+    "gui.py",
     "analyze.py",
-    "examples.py",
+    "quality_control.py",
+    "export_reporting.py",
     "requirements.txt",
-    "README.md",
-    "QUICKSTART.md",
-    "config_template.json"
+    "README.md"
 )
 foreach ($file in $files) {
     if (Test-Path $file) { Write-Host "✓ $file" } 
@@ -46,185 +216,126 @@ foreach ($file in $files) {
 
 Expected: All files should show ✓
 
-## Step 3: Test Import
+---
 
+## 🧪 Test Import
+
+### macOS/Linux
+```bash
+python -c "
+from gui import BreadPorositytoolGUI
+from quality_control import QualityControlManager
+from export_reporting import ExportEngine
+print('✓ All modules import successfully')
+"
+```
+
+### Windows
 ```powershell
 python -c "
-from imaging_pipeline import ImagingPipeline
-from metrics import PorometryMetrics
-from visualization import VisualizationEngine
-from calibration import ReferenceCalibration
+from gui import BreadPorositytoolGUI
+from quality_control import QualityControlManager
+from export_reporting import ExportEngine
 print('✓ All modules import successfully')
 "
 ```
 
 Expected output: `✓ All modules import successfully`
 
-## Step 4: View Setup Guide
+---
 
-```powershell
-python analyze.py --setup
-```
-
-Expected: Displays comprehensive imaging setup checklist
-
-## Step 5: Interactive Examples
-
-```powershell
-python examples.py
-```
-
-Menu will appear. Choose example 0 to see setup guide again.
-
-## Step 6: Test with Sample Image
-
-If you have a bread image:
-
-```powershell
-python analyze.py your_bread_image.jpg --pixel-size 0.1 --output test_results/
-```
-
-Check `test_results/` folder for:
-- [ ] comparison.png (6-step pipeline visualization)
-- [ ] hole_distribution.png (histograms and statistics)
-- [ ] annotated.png (holes highlighted on original)
-- [ ] metrics.json (raw metrics data)
-
-## Step 7: Verify Outputs
-
-```powershell
-Get-ChildItem test_results/
-```
-
-Expected files:
-- [ ] comparison.png
-- [ ] hole_distribution.png
-- [ ] annotated.png
-- [ ] metrics.json
-
-## Troubleshooting Installation
+## 🔧 Troubleshooting Installation
 
 ### Issue: "No module named cv2"
-```powershell
+```bash
+# macOS/Linux
+pip install opencv-python
+
+# Windows
 pip install opencv-python
 ```
 
 ### Issue: "No module named numpy"
-```powershell
+```bash
 pip install numpy
 ```
 
 ### Issue: "No module named matplotlib"
-```powershell
+```bash
 pip install matplotlib
 ```
 
 ### Issue: All dependencies installed but still getting import errors
-```powershell
+
+**macOS/Linux:**
+```bash
 pip install --upgrade pip
 pip install -r requirements.txt --force-reinstall
 ```
 
-### Issue: Image file not found
-- Check file path is correct
-- Ensure file extension is .jpg, .png, or .JPG
-- Use absolute path or copy image to bread_porosity/ folder
-
-## Quick Functionality Test
-
-Create a simple test script `test_tool.py`:
-
-```python
-from imaging_pipeline import ImagingPipeline
-from metrics import PorometryMetrics
-from visualization import VisualizationEngine
-import numpy as np
-import cv2
-
-# Test 1: Create synthetic bread image
-print("Test 1: Creating synthetic test image...")
-img = np.ones((400, 400, 3), dtype=np.uint8) * 150  # Gray background
-# Add some holes (bright spots)
-cv2.circle(img, (100, 100), 20, (255, 255, 255), -1)
-cv2.circle(img, (200, 150), 30, (255, 255, 255), -1)
-cv2.circle(img, (300, 250), 25, (255, 255, 255), -1)
-cv2.imwrite("test_synthetic.jpg", img)
-print("✓ Test image created: test_synthetic.jpg")
-
-# Test 2: Pipeline
-print("\nTest 2: Running pipeline...")
-pipeline = ImagingPipeline(verbose=True)
-pipeline.read_image("test_synthetic.jpg")
-pipeline.to_grayscale()
-pipeline.normalize_illumination()
-roi_mask, roi_stats = pipeline.find_bread_roi(threshold_value=100)
-pipeline.threshold_holes()
-pipeline.morphological_cleanup()
-print("✓ Pipeline successful")
-
-# Test 3: Metrics
-print("\nTest 3: Computing metrics...")
-metrics_comp = PorometryMetrics(pixel_size_mm=0.1)
-metrics = metrics_comp.compute_all_metrics(
-    pipeline.cleaned_binary,
-    pipeline.roi_mask,
-    pipeline.normalized
-)
-print(f"✓ Porosity: {metrics['porosity_percent']:.2f}%")
-print(f"✓ Holes detected: {metrics['num_holes']}")
-
-# Test 4: Visualization
-print("\nTest 4: Generating visualization...")
-visualizer = VisualizationEngine(output_dir="test_output")
-images = pipeline.get_processing_images()
-visualizer.create_comparison_image(images)
-visualizer.create_hole_distribution_plots(metrics)
-print("✓ Visualizations generated in test_output/")
-
-print("\n" + "="*50)
-print("ALL TESTS PASSED - Tool is ready to use!")
-print("="*50)
-```
-
-Run it:
+**Windows:**
 ```powershell
-python test_tool.py
+python -m pip install --upgrade pip
+pip install -r requirements.txt --force-reinstall
 ```
 
-Expected output: "ALL TESTS PASSED - Tool is ready to use!"
+### Issue: Python not found (Windows)
+- Reinstall Python and **check "Add Python to PATH"**
+- Use `py` instead of `python`: `py --version`
 
-## Next Steps After Verification
+### Issue: Permission denied (macOS/Linux)
+```bash
+# Run with sudo if needed
+sudo pip install -r requirements.txt
+```
 
-1. **Read QUICKSTART.md** for 30-second usage guide
-2. **Run examples.py** to try different workflows
-3. **Set up your imaging** following QUICKSTART or examples
-4. **Calibrate pixel_size_mm** for your camera
-5. **Analyze your first bread** sample
-6. **Review output files** to understand results
+### Issue: Virtual environment won't activate
 
-## System Requirements Summary
+**macOS/Linux:**
+```bash
+# Make sure you're in the project directory
+cd ~/Desktop/bread_porosity
+source venv/bin/activate
+```
 
-| Component | Minimum | Recommended |
-|-----------|---------|-------------|
-| Python | 3.8 | 3.10+ |
-| RAM | 2 GB | 4 GB+ |
-| Disk space | 500 MB | 2 GB+ |
-| Image size | 1 MP | 3-12 MP |
-| Processing time | ~30s | ~5-10s |
-
-## Performance Optimization
-
-For faster processing:
-- Use lower resolution images (downsize if >5000px)
-- Use GPU-accelerated OpenCV if available
-- Batch process multiple images
-
-For better accuracy:
-- Use high resolution images (3+ MP)
-- Improve lighting setup
-- Lock camera exposure/white balance
+**Windows:**
+```powershell
+# Make sure you're in the project directory
+cd C:\Users\YourUsername\Desktop\bread_porosity
+.\venv\Scripts\Activate.ps1
+```
 
 ---
 
-**Installation complete!** 
-Next: Follow QUICKSTART.md for your first analysis.
+## 🚀 Quick Start After Installation
+
+1. **Launch GUI**: `python gui.py`
+2. **Load Image**: Click "📂 Open Folder"
+3. **Select Image**: Choose a bread slice image
+4. **Analyze**: Click "▶ Analyze"
+5. **View Results**: Check "📈 Results" tab
+
+---
+
+## 📋 System Requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| Python | 3.9 | 3.11+ |
+| RAM | 2 GB | 4 GB+ |
+| Disk space | 500 MB | 2 GB+ |
+| Image size | 1 MP | 3-12 MP |
+
+---
+
+## 🎯 Next Steps
+
+1. Read [README.md](README.md) for feature overview
+2. Read [QUICK_START.md](QUICK_START.md) for usage guide
+3. Analyze your first bread image
+4. Check [FEATURES.md](FEATURES.md) for advanced features
+5. Review [BREAD_TYPE_PROFILES.md](BREAD_TYPE_PROFILES.md) for quality control
+
+---
+
+**Installation complete! Ready to analyze bread! 🍞📊**

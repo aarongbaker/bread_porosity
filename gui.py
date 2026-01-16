@@ -9,10 +9,13 @@ from pathlib import Path
 import threading
 from PIL import Image, ImageTk
 import json
+from datetime import datetime
 from analyze import analyze_bread_image
 from loaf_analyzer import analyze_loaf
 from recipe_database import RecipeDatabase
 from recipe_predictor import RecipePredictor
+from export_reporting import ExportEngine
+from quality_control import QualityControlManager
 import traceback
 
 
@@ -22,202 +25,297 @@ class BreadPorositytoolGUI:
         self.root.title("Bread Porosity Analysis Tool")
         self.root.geometry("1400x900")
         
-        # Professional color scheme
-        self.bg_primary = "#f8f9fa"
-        self.bg_secondary = "#ffffff"
-        self.bg_accent = "#007bff"
-        self.text_primary = "#212529"
-        self.text_secondary = "#6c757d"
-        self.border_color = "#dee2e6"
-        self.success_color = "#28a745"
-        self.warning_color = "#ffc107"
-        self.error_color = "#dc3545"
+        # Modern professional color scheme (Flat Design + Material Design inspired)
+        self.bg_primary = "#0f1419"       # Dark navy background
+        self.bg_secondary = "#1a1f2e"    # Dark card background
+        self.bg_tertiary = "#252c3c"     # Light dark background
+        self.bg_accent = "#1d9bf0"       # Modern blue
+        self.bg_accent_hover = "#1a8cd8" # Darker blue on hover
+        self.bg_success = "#17bf63"      # Modern green
+        self.bg_warning = "#ffb81c"      # Modern yellow
+        self.bg_error = "#f7555f"        # Modern red
+        self.text_primary = "#ffffff"    # White text
+        self.text_secondary = "#b0b9c1"  # Light gray text
+        self.text_tertiary = "#8a91a1"   # Darker gray
+        self.border_color = "#364558"    # Modern border
+        self.success_color = "#17bf63"
+        self.warning_color = "#ffb81c"
+        self.error_color = "#f7555f"
         
         self.root.configure(bg=self.bg_primary)
         
-        # Configure style
+        # Configure style with modern dark theme
         style = ttk.Style()
         style.theme_use('clam')
         
-        # Frame and Label styling
+        # Define custom colors for ttk
         style.configure("TFrame", background=self.bg_primary)
-        style.configure("TLabelframe", background=self.bg_primary, foreground=self.text_primary, 
-                       borderwidth=1, relief="flat")
-        style.configure("TLabelframe.Label", background=self.bg_primary, foreground=self.text_primary,
-                       font=("Segoe UI", 10, "bold"))
-        style.configure("TLabel", background=self.bg_primary, foreground=self.text_primary)
-        style.configure("Header.TLabel", background=self.bg_primary, foreground=self.text_primary, 
-                       font=("Segoe UI", 12, "bold"))
-        style.configure("Subheader.TLabel", background=self.bg_primary, foreground=self.text_primary,
-                       font=("Segoe UI", 9, "bold"))
+        style.configure("Card.TFrame", background=self.bg_secondary, relief="flat")
         
-        # Button styling
-        style.configure("TButton", font=("Segoe UI", 9), relief="flat", padding=6)
+        style.configure("TLabelframe", background=self.bg_secondary, foreground=self.text_primary, 
+                       borderwidth=0, relief="flat")
+        style.configure("TLabelframe.Label", background=self.bg_secondary, foreground=self.text_primary,
+                       font=("Segoe UI", 11, "bold"))
+        
+        style.configure("TLabel", background=self.bg_primary, foreground=self.text_primary,
+                       font=("Segoe UI", 9))
+        style.configure("Header.TLabel", background=self.bg_primary, foreground=self.text_primary, 
+                       font=("Segoe UI", 13, "bold"))
+        style.configure("Subheader.TLabel", background=self.bg_secondary, foreground=self.text_secondary,
+                       font=("Segoe UI", 8, "bold"))
+        style.configure("Subtitle.TLabel", background=self.bg_secondary, foreground=self.text_secondary,
+                       font=("Segoe UI", 8))
+        
+        # Modern button styling with rounded appearance
+        style.configure("TButton", font=("Segoe UI", 9), relief="flat", padding=8,
+                       background=self.bg_tertiary, foreground=self.text_primary, 
+                       borderwidth=0)
         style.map("TButton",
-                 background=[("pressed", self.bg_accent), ("active", "#0056b3"), ("!active", "#e9ecef")],
-                 foreground=[("pressed", "white"), ("active", "white"), ("!active", self.text_primary)])
+                 background=[("pressed", self.bg_accent), ("active", self.bg_accent_hover), 
+                            ("!active", self.bg_tertiary)],
+                 foreground=[("pressed", "white"), ("active", "white"), ("!active", self.text_primary)],
+                 relief=[("pressed", "flat"), ("active", "flat")])
+        
+        # Accent button style
+        style.configure("Accent.TButton", font=("Segoe UI", 10, "bold"), relief="flat", 
+                       padding=10, background=self.bg_accent, foreground="white", borderwidth=0)
+        style.map("Accent.TButton",
+                 background=[("pressed", self.bg_accent_hover), ("active", self.bg_accent_hover),
+                            ("!active", self.bg_accent)],
+                 foreground=[("pressed", "white"), ("active", "white"), ("!active", "white")])
         
         # Combobox styling
-        style.configure("TCombobox", font=("Segoe UI", 9), fieldbackground=self.bg_secondary)
+        style.configure("TCombobox", font=("Segoe UI", 9), fieldbackground=self.bg_tertiary,
+                       background=self.bg_tertiary, foreground=self.text_primary)
+        style.map("TCombobox",
+                 fieldbackground=[("focus", self.bg_accent), ("!focus", self.bg_tertiary)],
+                 background=[("focus", self.bg_accent), ("!focus", self.bg_tertiary)])
         
-        # Notebook styling
+        # Notebook (tabs) styling
         style.configure("TNotebook", background=self.bg_primary, borderwidth=0)
-        style.configure("TNotebook.Tab", padding=[16, 12], font=("Segoe UI", 10))
+        style.configure("TNotebook.Tab", padding=[16, 12], font=("Segoe UI", 10, "bold"),
+                       background=self.bg_tertiary, foreground=self.text_secondary)
         style.map("TNotebook.Tab", 
-                 background=[("selected", self.bg_secondary)])
+                 background=[("selected", self.bg_accent), ("!selected", self.bg_tertiary)],
+                 foreground=[("selected", "white"), ("!selected", self.text_secondary)])
         
         # Radio and Checkbutton styling
-        style.configure("TRadiobutton", background=self.bg_primary, foreground=self.text_primary,
+        style.configure("TRadiobutton", background=self.bg_secondary, foreground=self.text_primary,
                        font=("Segoe UI", 9))
-        style.configure("TCheckbutton", background=self.bg_primary, foreground=self.text_primary,
+        style.map("TRadiobutton",
+                 background=[("active", self.bg_secondary), ("!active", self.bg_secondary)])
+        
+        style.configure("TCheckbutton", background=self.bg_secondary, foreground=self.text_primary,
                        font=("Segoe UI", 9))
+        style.map("TCheckbutton",
+                 background=[("active", self.bg_secondary), ("!active", self.bg_secondary)])
+        
+        # Scrollbar styling
+        style.configure("Vertical.TScrollbar", background=self.bg_tertiary, troughcolor=self.bg_secondary,
+                       arrowcolor=self.text_secondary, borderwidth=0)
         
         # Setup directories
         self.unprocessed_dir = Path("unprocessed")
         self.processed_dir = Path("processed")
         self.results_dir = Path("results")
+        self.output_dir = Path("output")
         
-        for d in [self.unprocessed_dir, self.processed_dir, self.results_dir]:
+        for d in [self.unprocessed_dir, self.processed_dir, self.results_dir, self.output_dir]:
             d.mkdir(exist_ok=True)
         
         # Initialize recipe database and predictor
         self.recipe_db = RecipeDatabase("recipes.json")
         self.recipe_predictor = RecipePredictor(self.recipe_db.get_recipes_with_porosity())
         
+        # Initialize export and quality control managers
+        self.export_engine = ExportEngine(output_dir=str(self.output_dir))
+        self.qc_manager = QualityControlManager(config_file="qc_config.json")
+        
         self.current_image = None
         self.current_image_path = None
         self.analysis_result = None
+        self.analysis_history = []  # Track all analyses for batch operations
         self.current_recipe_id = None
         
         self.setup_ui()
         self.refresh_image_list()
     
     def setup_ui(self):
-        """Setup the user interface"""
+        """Setup the user interface with modern professional styling"""
         
-        # Header
+        # Header with gradient-like effect using dark background
         header = ttk.Frame(self.root)
         header.pack(fill=tk.X, padx=0, pady=0)
         
-        header_bg = tk.Frame(header, bg=self.bg_accent, height=70)
+        header_bg = tk.Frame(header, bg=self.bg_accent, height=80)
         header_bg.pack(fill=tk.X)
         
-        title_label = tk.Label(header_bg, text="Bread Porosity Analysis Tool", 
-                               font=("Segoe UI", 18, "bold"), fg="white", bg=self.bg_accent)
-        title_label.pack(pady=15)
+        # Header content with branding
+        header_content = tk.Frame(header_bg, bg=self.bg_accent)
+        header_content.pack(fill=tk.BOTH, expand=True, padx=25, pady=0)
+        
+        title_label = tk.Label(header_content, text="🍞  Bread Porosity Analysis", 
+                               font=("Segoe UI", 20, "bold"), fg="white", bg=self.bg_accent)
+        title_label.pack(anchor=tk.W, pady=(15, 5))
+        
+        subtitle_label = tk.Label(header_content, text="Professional Analysis & Quality Control", 
+                                 font=("Segoe UI", 9), fg=self.text_secondary, bg=self.bg_accent)
+        subtitle_label.pack(anchor=tk.W, pady=(0, 15))
         
         # Main container with padding
         main_container = ttk.Frame(self.root)
-        main_container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
+        main_container.pack(fill=tk.BOTH, expand=True, padx=16, pady=16)
         
-        # Left panel - Controls
-        left_panel = ttk.Frame(main_container, width=320)
-        left_panel.pack(side=tk.LEFT, fill=tk.BOTH, padx=(0, 15))
+        # Left panel - Controls with enhanced styling
+        left_panel = ttk.Frame(main_container, width=340)
+        left_panel.pack(side=tk.LEFT, fill=tk.BOTH, padx=(0, 12))
         
         # Image Management Section
-        img_section = ttk.LabelFrame(left_panel, text="Image Library", padding=12)
-        img_section.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+        img_section_bg = tk.Frame(left_panel, bg=self.bg_secondary, highlightthickness=0)
+        img_section_bg.pack(fill=tk.BOTH, expand=True, pady=(0, 12))
+        
+        img_section = tk.Frame(img_section_bg, bg=self.bg_secondary)
+        img_section.pack(fill=tk.BOTH, expand=True, padx=12, pady=12)
+        
+        img_header = tk.Label(img_section, text="📁  Image Library", 
+                             font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
+        img_header.pack(anchor=tk.W, pady=(0, 12))
         
         # Listbox with professional styling
         listbox_frame = ttk.Frame(img_section)
         listbox_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
         
-        scrollbar = ttk.Scrollbar(listbox_frame)
+        scrollbar = ttk.Scrollbar(listbox_frame, orient=tk.VERTICAL)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         
         self.image_listbox = tk.Listbox(listbox_frame, yscrollcommand=scrollbar.set, 
                                          height=12, font=("Segoe UI", 9), 
-                                         bg=self.bg_secondary, fg=self.text_primary,
+                                         bg=self.bg_tertiary, fg=self.text_primary,
                                          relief=tk.FLAT, borderwidth=0, highlightthickness=1,
-                                         highlightcolor=self.bg_accent)
+                                         highlightcolor=self.bg_accent, selectbackground=self.bg_accent,
+                                         selectforeground="white", activestyle="none")
         self.image_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.config(command=self.image_listbox.yview)
         self.image_listbox.bind("<<ListboxSelect>>", self.on_image_select)
         
-        # Button row
+        # Button row with better spacing
         button_row = ttk.Frame(img_section)
-        button_row.pack(fill=tk.X)
+        button_row.pack(fill=tk.X, pady=(8, 0))
         
-        ttk.Button(button_row, text="Open Folder", 
-                  command=self.open_folder).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
-        ttk.Button(button_row, text="Refresh", 
+        ttk.Button(button_row, text="📂 Open Folder", 
+                  command=self.open_folder).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 6))
+        ttk.Button(button_row, text="🔄 Refresh", 
                   command=self.refresh_image_list).pack(side=tk.LEFT, fill=tk.X, expand=True)
         
         # Parameters Section
-        params_frame = ttk.LabelFrame(left_panel, text="Analysis Parameters", padding=12)
-        params_frame.pack(fill=tk.X, pady=10)
+        params_bg = tk.Frame(left_panel, bg=self.bg_secondary, highlightthickness=0)
+        params_bg.pack(fill=tk.X, pady=(0, 12))
         
-        # Pixel size
-        ttk.Label(params_frame, text="Pixel Size (mm):", style="Subheader.TLabel").grid(
-            row=0, column=0, sticky=tk.W, pady=8)
+        params_frame = tk.Frame(params_bg, bg=self.bg_secondary)
+        params_frame.pack(fill=tk.X, padx=12, pady=12)
+        
+        params_header = tk.Label(params_frame, text="⚙️  Analysis Parameters", 
+                                font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
+        params_header.pack(anchor=tk.W, pady=(0, 12))
+        
+        # Grid frame for parameters (separate from pack-based layout)
+        params_grid_frame = tk.Frame(params_frame, bg=self.bg_secondary)
+        params_grid_frame.pack(fill=tk.X)
+        
+        # Pixel size with label styling
+        pixel_label = tk.Label(params_grid_frame, text="Pixel Size (mm):", 
+                              font=("Segoe UI", 8, "bold"), fg=self.text_secondary, bg=self.bg_secondary)
+        pixel_label.grid(row=0, column=0, sticky=tk.W, pady=8)
         self.pixel_size_var = tk.DoubleVar(value=0.1)
-        pixel_entry = ttk.Entry(params_frame, textvariable=self.pixel_size_var, width=15)
-        pixel_entry.grid(row=0, column=1, sticky=tk.W, padx=(10, 0))
+        pixel_entry = ttk.Entry(params_grid_frame, textvariable=self.pixel_size_var, width=18)
+        pixel_entry.grid(row=0, column=1, sticky=tk.E, padx=(10, 0))
         
-        # Threshold
-        ttk.Label(params_frame, text="Threshold Method:", style="Subheader.TLabel").grid(
-            row=1, column=0, sticky=tk.W, pady=8)
+        # Threshold method
+        thresh_label = tk.Label(params_grid_frame, text="Threshold Method:", 
+                               font=("Segoe UI", 8, "bold"), fg=self.text_secondary, bg=self.bg_secondary)
+        thresh_label.grid(row=1, column=0, sticky=tk.W, pady=8)
         self.threshold_var = tk.StringVar(value="otsu")
-        ttk.Combobox(params_frame, textvariable=self.threshold_var, 
-                    values=["otsu", "adaptive"], state="readonly", width=13).grid(
-            row=1, column=1, sticky=tk.W, padx=(10, 0))
+        ttk.Combobox(params_grid_frame, textvariable=self.threshold_var, 
+                    values=["otsu", "adaptive"], state="readonly", width=16).grid(
+            row=1, column=1, sticky=tk.E, padx=(10, 0))
         
-        # Normalize
-        ttk.Label(params_frame, text="Normalization:", style="Subheader.TLabel").grid(
-            row=2, column=0, sticky=tk.W, pady=8)
+        # Normalization
+        norm_label = tk.Label(params_grid_frame, text="Normalization:", 
+                             font=("Segoe UI", 8, "bold"), fg=self.text_secondary, bg=self.bg_secondary)
+        norm_label.grid(row=2, column=0, sticky=tk.W, pady=8)
         self.normalize_var = tk.StringVar(value="clahe")
-        ttk.Combobox(params_frame, textvariable=self.normalize_var,
-                    values=["clahe", "morphology", "gaussian"], state="readonly", width=13).grid(
-            row=2, column=1, sticky=tk.W, padx=(10, 0))
+        ttk.Combobox(params_grid_frame, textvariable=self.normalize_var,
+                    values=["clahe", "morphology", "gaussian"], state="readonly", width=16).grid(
+            row=2, column=1, sticky=tk.E, padx=(10, 0))
         
         # Mode Selection
-        mode_frame = ttk.LabelFrame(left_panel, text="Analysis Mode", padding=12)
-        mode_frame.pack(fill=tk.X, pady=10)
+        mode_bg = tk.Frame(left_panel, bg=self.bg_secondary, highlightthickness=0)
+        mode_bg.pack(fill=tk.X, pady=(0, 12))
+        
+        mode_frame = tk.Frame(mode_bg, bg=self.bg_secondary)
+        mode_frame.pack(fill=tk.X, padx=12, pady=12)
+        
+        mode_header = tk.Label(mode_frame, text="🔍  Analysis Mode", 
+                              font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
+        mode_header.pack(anchor=tk.W, pady=(0, 10))
         
         self.mode_var = tk.StringVar(value="single")
         ttk.Radiobutton(mode_frame, text="Single Image", variable=self.mode_var, 
-                       value="single", command=self.on_mode_change).pack(anchor=tk.W, pady=5)
+                       value="single", command=self.on_mode_change).pack(anchor=tk.W, pady=4)
         ttk.Radiobutton(mode_frame, text="Loaf (Multiple Slices)", variable=self.mode_var,
-                       value="loaf", command=self.on_mode_change).pack(anchor=tk.W, pady=5)
+                       value="loaf", command=self.on_mode_change).pack(anchor=tk.W, pady=4)
         
         # Loaf name
-        ttk.Label(mode_frame, text="Loaf Name:", style="Subheader.TLabel").pack(anchor=tk.W, pady=(10, 5))
+        loaf_label = tk.Label(mode_frame, text="Loaf Name:", 
+                             font=("Segoe UI", 8, "bold"), fg=self.text_secondary, bg=self.bg_secondary)
+        loaf_label.pack(anchor=tk.W, pady=(10, 4))
         self.loaf_name_var = tk.StringVar(value="my_loaf")
         self.loaf_name_entry = ttk.Entry(mode_frame, textvariable=self.loaf_name_var, width=30)
         self.loaf_name_entry.pack(fill=tk.X)
         self.loaf_name_entry.config(state=tk.DISABLED)
         
-        # Action Buttons
-        action_frame = ttk.Frame(left_panel)
-        action_frame.pack(fill=tk.X, pady=15)
+        # Action Buttons with professional styling
+        action_bg = tk.Frame(left_panel, bg=self.bg_secondary, highlightthickness=0)
+        action_bg.pack(fill=tk.X, pady=(0, 12))
         
-        self.analyze_btn = tk.Button(action_frame, text="Analyze", 
+        action_frame = tk.Frame(action_bg, bg=self.bg_secondary)
+        action_frame.pack(fill=tk.X, padx=12, pady=12)
+        
+        self.analyze_btn = tk.Button(action_frame, text="▶  Analyze", 
                                      command=self.start_analysis,
                                      bg=self.bg_accent, fg="white",
                                      font=("Segoe UI", 11, "bold"),
-                                     relief=tk.FLAT, padx=20, pady=12,
-                                     cursor="hand2", activebackground="#0056b3")
-        self.analyze_btn.pack(fill=tk.X, pady=(0, 8))
+                                     relief=tk.FLAT, padx=20, pady=14,
+                                     cursor="hand2", activebackground=self.bg_accent_hover,
+                                     activeforeground="white", bd=0, highlightthickness=0)
+        self.analyze_btn.pack(fill=tk.X, pady=(0, 10))
         
-        ttk.Button(action_frame, text="Clear Selection", 
+        ttk.Button(action_frame, text="✕ Clear Selection", 
                   command=self.clear_selection).pack(fill=tk.X)
         
         # Status Section
-        status_frame = ttk.LabelFrame(left_panel, text="Status", padding=12)
-        status_frame.pack(fill=tk.X, pady=10)
+        status_bg = tk.Frame(left_panel, bg=self.bg_secondary, highlightthickness=0)
+        status_bg.pack(fill=tk.X)
+        
+        status_frame = tk.Frame(status_bg, bg=self.bg_secondary)
+        status_frame.pack(fill=tk.X, padx=12, pady=12)
+        
+        status_header = tk.Label(status_frame, text="📊  Status", 
+                                font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
+        status_header.pack(anchor=tk.W, pady=(0, 10))
         
         self.status_var = tk.StringVar(value="Ready")
         self.status_label = tk.Label(status_frame, textvariable=self.status_var, 
                                     foreground=self.success_color, 
-                                    font=("Segoe UI", 9, "bold"),
-                                    bg=self.bg_primary, wraplength=280, justify=tk.LEFT)
+                                    font=("Segoe UI", 9),
+                                    bg=self.bg_secondary, wraplength=290, justify=tk.LEFT)
         self.status_label.pack(fill=tk.X)
         
         # Progress bar
         self.progress = ttk.Progressbar(status_frame, mode='indeterminate', length=280)
-        self.progress.pack(fill=tk.X, pady=(10, 0))
+        self.progress.pack(fill=tk.X, pady=(8, 0))
         
-        # Right panel - Results
+        # Right panel - Results with modern notebook
         right_panel = ttk.Frame(main_container)
         right_panel.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
         
@@ -227,19 +325,19 @@ class BreadPorositytoolGUI:
         
         # Preview tab
         preview_tab = ttk.Frame(self.notebook)
-        self.notebook.add(preview_tab, text="Preview")
+        self.notebook.add(preview_tab, text="🖼️  Preview")
         
         preview_bg = tk.Frame(preview_tab, bg=self.bg_secondary)
         preview_bg.pack(fill=tk.BOTH, expand=True, padx=2, pady=2)
         
         self.preview_label = tk.Label(preview_bg, text="Select an image to preview", 
-                                      bg=self.bg_secondary, fg=self.text_secondary,
-                                      font=("Segoe UI", 10))
+                                      bg=self.bg_secondary, fg=self.text_tertiary,
+                                      font=("Segoe UI", 11))
         self.preview_label.pack(fill=tk.BOTH, expand=True)
         
         # Results tab
         results_tab = ttk.Frame(self.notebook)
-        self.notebook.add(results_tab, text="Results")
+        self.notebook.add(results_tab, text="📈  Results")
         
         results_scroll = ttk.Scrollbar(results_tab)
         results_scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -247,13 +345,13 @@ class BreadPorositytoolGUI:
         self.results_text = tk.Text(results_tab, yscrollcommand=results_scroll.set,
                                     font=("Consolas", 9), bg=self.bg_secondary,
                                     fg=self.text_primary, relief=tk.FLAT, 
-                                    borderwidth=0, padx=10, pady=10)
+                                    borderwidth=0, padx=12, pady=12)
         self.results_text.pack(fill=tk.BOTH, expand=True)
         results_scroll.config(command=self.results_text.yview)
         
         # Metrics tab
         metrics_tab = ttk.Frame(self.notebook)
-        self.notebook.add(metrics_tab, text="Metrics (JSON)")
+        self.notebook.add(metrics_tab, text="📊  Metrics")
         
         metrics_scroll = ttk.Scrollbar(metrics_tab)
         metrics_scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -261,28 +359,36 @@ class BreadPorositytoolGUI:
         self.metrics_text = tk.Text(metrics_tab, yscrollcommand=metrics_scroll.set,
                                    font=("Consolas", 9), bg=self.bg_secondary,
                                    fg=self.text_primary, relief=tk.FLAT,
-                                   borderwidth=0, padx=10, pady=10)
+                                   borderwidth=0, padx=12, pady=12)
         self.metrics_text.pack(fill=tk.BOTH, expand=True)
         metrics_scroll.config(command=self.metrics_text.yview)
         
         # Recipe Management tab
         recipe_tab = ttk.Frame(self.notebook)
-        self.notebook.add(recipe_tab, text="Recipes & Prediction")
+        self.notebook.add(recipe_tab, text="🍞  Recipes")
         
         recipe_container = ttk.Frame(recipe_tab)
-        recipe_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        recipe_container.pack(fill=tk.BOTH, expand=True, padx=12, pady=12)
         
         # Left side - Recipe input
-        left_recipe = ttk.LabelFrame(recipe_container, text="New Recipe", padding=12)
-        left_recipe.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 10))
+        left_recipe_bg = tk.Frame(recipe_container, bg=self.bg_secondary, highlightthickness=0)
+        left_recipe_bg.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 12))
+        
+        left_recipe = tk.Frame(left_recipe_bg, bg=self.bg_secondary)
+        left_recipe.pack(fill=tk.BOTH, expand=True, padx=12, pady=12)
+        
+        recipe_header_left = tk.Label(left_recipe, text="✏️  New Recipe", 
+                                      font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
+        recipe_header_left.pack(anchor=tk.W, pady=(0, 10))
         
         recipe_scroll = ttk.Scrollbar(left_recipe)
         recipe_scroll.pack(side=tk.RIGHT, fill=tk.Y)
         
         self.recipe_input_text = tk.Text(left_recipe, yscrollcommand=recipe_scroll.set,
-                                        font=("Consolas", 9), bg=self.bg_secondary,
+                                        font=("Consolas", 12), bg=self.bg_tertiary,
                                         fg=self.text_primary, relief=tk.FLAT,
-                                        borderwidth=0, padx=8, pady=8, height=25)
+                                        borderwidth=0, padx=8, pady=8, height=25,
+                                        insertbackground=self.bg_accent)
         self.recipe_input_text.pack(fill=tk.BOTH, expand=True)
         recipe_scroll.config(command=self.recipe_input_text.yview)
         
@@ -312,45 +418,56 @@ class BreadPorositytoolGUI:
         self.recipe_input_text.insert(1.0, template)
         
         # Right side - Recipe management and prediction
-        right_recipe = ttk.LabelFrame(recipe_container, text="Recipe Management", padding=12)
-        right_recipe.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        right_recipe_bg = tk.Frame(recipe_container, bg=self.bg_secondary, highlightthickness=0)
+        right_recipe_bg.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
         
-        # Recipe list
-        ttk.Label(right_recipe, text="Saved Recipes:").pack(anchor=tk.W)
-        recipe_listbox_frame = ttk.Frame(right_recipe)
-        recipe_listbox_frame.pack(fill=tk.BOTH, expand=True, pady=(5, 10))
+        right_recipe = tk.Frame(right_recipe_bg, bg=self.bg_secondary)
+        right_recipe.pack(fill=tk.BOTH, expand=True, padx=12, pady=12)
+        
+        recipe_header_right = tk.Label(right_recipe, text="🔧  Recipe Management", 
+                                       font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
+        recipe_header_right.pack(anchor=tk.W, pady=(0, 10))
+        
+        # Recipe list label
+        recipe_list_label = tk.Label(right_recipe, text="Saved Recipes:", 
+                                     font=("Segoe UI", 9), fg=self.text_secondary, bg=self.bg_secondary)
+        recipe_list_label.pack(anchor=tk.W, pady=(0, 8))
+        
+        recipe_listbox_frame = tk.Frame(right_recipe, bg=self.bg_secondary)
+        recipe_listbox_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 12))
         
         recipe_scrollbar = ttk.Scrollbar(recipe_listbox_frame)
         recipe_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         
         self.recipe_listbox = tk.Listbox(recipe_listbox_frame, yscrollcommand=recipe_scrollbar.set,
-                                        font=("Segoe UI", 9), bg=self.bg_secondary,
+                                        font=("Segoe UI", 9), bg=self.bg_tertiary,
                                         fg=self.text_primary, relief=tk.FLAT,
                                         borderwidth=0, highlightthickness=1,
-                                        highlightcolor=self.bg_accent)
+                                        highlightcolor=self.bg_accent, selectbackground=self.bg_accent,
+                                        selectforeground="white", activestyle="none")
         self.recipe_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.recipe_listbox.bind("<<ListboxSelect>>", self.on_recipe_select)
         recipe_scrollbar.config(command=self.recipe_listbox.yview)
         
         # Recipe buttons
-        recipe_btn_frame = ttk.Frame(right_recipe)
-        recipe_btn_frame.pack(fill=tk.X, pady=(10, 10))
+        recipe_btn_frame = tk.Frame(right_recipe, bg=self.bg_secondary)
+        recipe_btn_frame.pack(fill=tk.X)
         
-        ttk.Button(recipe_btn_frame, text="Log Recipe", 
-                  command=self.log_new_recipe).pack(fill=tk.X, pady=(0, 5))
-        ttk.Button(recipe_btn_frame, text="Save Porosity", 
-                  command=self.save_recipe_porosity).pack(fill=tk.X, pady=(0, 5))
-        ttk.Button(recipe_btn_frame, text="Predict", 
-                  command=self.predict_from_recipe).pack(fill=tk.X, pady=(0, 5))
-        ttk.Button(recipe_btn_frame, text="Create Variant", 
-                  command=self.create_recipe_variant).pack(fill=tk.X, pady=(0, 5))
-        ttk.Button(recipe_btn_frame, text="Clone Recipe", 
-                  command=self.clone_recipe).pack(fill=tk.X, pady=(0, 5))
-        ttk.Button(recipe_btn_frame, text="Scale Recipe", 
-                  command=self.scale_recipe_gui).pack(fill=tk.X, pady=(0, 5))
-        ttk.Button(recipe_btn_frame, text="Family Tree", 
-                  command=self.display_recipe_family).pack(fill=tk.X, pady=(0, 5))
-        ttk.Button(recipe_btn_frame, text="Delete", 
+        ttk.Button(recipe_btn_frame, text="📥 Log Recipe", 
+                  command=self.log_new_recipe).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(recipe_btn_frame, text="💾 Save Porosity", 
+                  command=self.save_recipe_porosity).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(recipe_btn_frame, text="🔮 Predict", 
+                  command=self.predict_from_recipe).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(recipe_btn_frame, text="🔀 Create Variant", 
+                  command=self.create_recipe_variant).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(recipe_btn_frame, text="📋 Clone Recipe", 
+                  command=self.clone_recipe).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(recipe_btn_frame, text="📐 Scale Recipe", 
+                  command=self.scale_recipe_gui).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(recipe_btn_frame, text="🌳 Family Tree", 
+                  command=self.display_recipe_family).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(recipe_btn_frame, text="🗑️  Delete", 
                   command=self.delete_recipe).pack(fill=tk.X)
         
         # Prediction results
@@ -368,7 +485,7 @@ class BreadPorositytoolGUI:
         
         # Statistics Dashboard tab
         stats_tab = ttk.Frame(self.notebook)
-        self.notebook.add(stats_tab, text="Statistics Dashboard")
+        self.notebook.add(stats_tab, text="📊  Statistics")
         
         stats_scroll = ttk.Scrollbar(stats_tab)
         stats_scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -376,19 +493,20 @@ class BreadPorositytoolGUI:
         self.stats_text = tk.Text(stats_tab, yscrollcommand=stats_scroll.set,
                                  font=("Consolas", 9), bg=self.bg_secondary,
                                  fg=self.text_primary, relief=tk.FLAT,
-                                 borderwidth=0, padx=10, pady=10)
+                                 borderwidth=0, padx=12, pady=12,
+                                 insertbackground=self.bg_accent)
         self.stats_text.pack(fill=tk.BOTH, expand=True)
         stats_scroll.config(command=self.stats_text.yview)
         
         # Button to refresh stats
         stats_btn_frame = ttk.Frame(stats_tab)
-        stats_btn_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
-        ttk.Button(stats_btn_frame, text="Refresh Statistics", 
+        stats_btn_frame.pack(fill=tk.X, padx=12, pady=(0, 12))
+        ttk.Button(stats_btn_frame, text="🔄 Refresh Statistics", 
                   command=self.display_statistics_dashboard).pack(side=tk.LEFT)
         
         # Loaf Consistency Tracking tab
         consist_tab = ttk.Frame(self.notebook)
-        self.notebook.add(consist_tab, text="Loaf Consistency")
+        self.notebook.add(consist_tab, text="🥖  Consistency")
         
         consist_scroll = ttk.Scrollbar(consist_tab)
         consist_scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -396,13 +514,14 @@ class BreadPorositytoolGUI:
         self.consist_text = tk.Text(consist_tab, yscrollcommand=consist_scroll.set,
                                    font=("Consolas", 9), bg=self.bg_secondary,
                                    fg=self.text_primary, relief=tk.FLAT,
-                                   borderwidth=0, padx=10, pady=10)
+                                   borderwidth=0, padx=12, pady=12,
+                                   insertbackground=self.bg_accent)
         self.consist_text.pack(fill=tk.BOTH, expand=True)
         consist_scroll.config(command=self.consist_text.yview)
         
         # Comparison Tools tab
         compare_tab = ttk.Frame(self.notebook)
-        self.notebook.add(compare_tab, text="Comparison Tools")
+        self.notebook.add(compare_tab, text="⚖️  Compare")
         
         compare_scroll = ttk.Scrollbar(compare_tab)
         compare_scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -410,17 +529,129 @@ class BreadPorositytoolGUI:
         self.compare_text = tk.Text(compare_tab, yscrollcommand=compare_scroll.set,
                                    font=("Consolas", 9), bg=self.bg_secondary,
                                    fg=self.text_primary, relief=tk.FLAT,
-                                   borderwidth=0, padx=10, pady=10)
+                                   borderwidth=0, padx=12, pady=12,
+                                   insertbackground=self.bg_accent)
         self.compare_text.pack(fill=tk.BOTH, expand=True)
         compare_scroll.config(command=self.compare_text.yview)
         
         # Buttons for comparison
         compare_btn_frame = ttk.Frame(compare_tab)
-        compare_btn_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
-        ttk.Button(compare_btn_frame, text="Compare Recipes", 
+        compare_btn_frame.pack(fill=tk.X, padx=12, pady=(0, 12))
+        ttk.Button(compare_btn_frame, text="📋 Compare Recipes", 
                   command=self.compare_recipes).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(compare_btn_frame, text="What-If Analysis", 
+        ttk.Button(compare_btn_frame, text="🔍 What-If Analysis", 
                   command=self.what_if_analysis).pack(side=tk.LEFT)
+        
+        # Export & Reporting tab
+        export_tab = ttk.Frame(self.notebook)
+        self.notebook.add(export_tab, text="💾  Export")
+        
+        export_container = ttk.Frame(export_tab)
+        export_container.pack(fill=tk.BOTH, expand=True, padx=12, pady=12)
+        
+        # Export options
+        export_options_bg = tk.Frame(export_container, bg=self.bg_secondary, highlightthickness=0)
+        export_options_bg.pack(fill=tk.X, pady=(0, 12))
+        
+        export_options_frame = tk.Frame(export_options_bg, bg=self.bg_secondary)
+        export_options_frame.pack(fill=tk.X, padx=12, pady=12)
+        
+        export_header = tk.Label(export_options_frame, text="📋  Export Format", 
+                                font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
+        export_header.pack(anchor=tk.W, pady=(0, 10))
+        
+        ttk.Button(export_options_frame, text="📊 Export to CSV", 
+                  command=self.export_batch_csv).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(export_options_frame, text="📈 Export to Excel", 
+                  command=self.export_batch_excel).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(export_options_frame, text="📄 Generate PDF Report", 
+                  command=self.export_batch_pdf).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(export_options_frame, text="📉 Create Summary Charts", 
+                  command=self.create_summary_charts).pack(fill=tk.X)
+        
+        # Export results display
+        export_scroll = ttk.Scrollbar(export_container)
+        export_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        self.export_text = tk.Text(export_container, yscrollcommand=export_scroll.set,
+                                   font=("Consolas", 9), bg=self.bg_tertiary,
+                                   fg=self.text_primary, relief=tk.FLAT,
+                                   borderwidth=0, padx=12, pady=12,
+                                   insertbackground=self.bg_accent)
+        self.export_text.pack(fill=tk.BOTH, expand=True)
+        export_scroll.config(command=self.export_text.yview)
+        
+        # Quality Control tab
+        qc_tab = ttk.Frame(self.notebook)
+        self.notebook.add(qc_tab, text="✓  Quality Control")
+        
+        qc_container = ttk.Frame(qc_tab)
+        qc_container.pack(fill=tk.BOTH, expand=True, padx=12, pady=12)
+        
+        # Bread Type Selector
+        bread_type_bg = tk.Frame(qc_container, bg=self.bg_secondary, highlightthickness=0)
+        bread_type_bg.pack(fill=tk.X, pady=(0, 12))
+        
+        bread_type_frame = tk.Frame(bread_type_bg, bg=self.bg_secondary)
+        bread_type_frame.pack(fill=tk.X, padx=12, pady=12)
+        
+        bread_header = tk.Label(bread_type_frame, text="🍞  Bread Type Profile", 
+                               font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
+        bread_header.pack(anchor=tk.W, pady=(0, 10))
+        
+        bread_selector_row = tk.Frame(bread_type_frame, bg=self.bg_secondary)
+        bread_selector_row.pack(fill=tk.X)
+        
+        selector_label = tk.Label(bread_selector_row, text="Select type:", 
+                                 font=("Segoe UI", 9), fg=self.text_secondary, bg=self.bg_secondary)
+        selector_label.pack(side=tk.LEFT, padx=(0, 10))
+        
+        self.bread_type_var = tk.StringVar(value="sourdough")
+        bread_types = self.qc_manager.get_all_bread_types()
+        self.bread_type_combo = ttk.Combobox(bread_selector_row, textvariable=self.bread_type_var,
+                                            values=list(bread_types.values()),
+                                            state="readonly", width=18)
+        self.bread_type_combo.pack(side=tk.LEFT, padx=(0, 10))
+        self.bread_type_combo.bind("<<ComboboxSelected>>", self._on_bread_type_change)
+        
+        ttk.Button(bread_selector_row, text="👁️  View Profile", 
+                  command=self.qc_view_bread_profile).pack(side=tk.LEFT, padx=(0, 6))
+        ttk.Button(bread_selector_row, text="✏️  Edit Profile", 
+                  command=self.qc_edit_bread_profile).pack(side=tk.LEFT)
+        
+        # QC Controls frame
+        qc_controls_bg = tk.Frame(qc_container, bg=self.bg_secondary, highlightthickness=0)
+        qc_controls_bg.pack(fill=tk.X, pady=(0, 12))
+        
+        qc_controls_frame = tk.Frame(qc_controls_bg, bg=self.bg_secondary)
+        qc_controls_frame.pack(fill=tk.X, padx=12, pady=12)
+        
+        qc_controls_header = tk.Label(qc_controls_frame, text="🔍  Quality Control Tools", 
+                                      font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
+        qc_controls_header.pack(anchor=tk.W, pady=(0, 10))
+        
+        ttk.Button(qc_controls_frame, text="✓ Evaluate Current Analysis", 
+                  command=self.qc_evaluate_current).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(qc_controls_frame, text="📦 Check Batch Consistency", 
+                  command=self.qc_batch_consistency).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(qc_controls_frame, text="📊 SPC Statistics", 
+                  command=self.qc_spc_statistics).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(qc_controls_frame, text="⚠️  View Alerts", 
+                  command=self.qc_view_alerts).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(qc_controls_frame, text="⚙️  Configure Thresholds", 
+                  command=self.qc_configure_thresholds).pack(fill=tk.X)
+        
+        # QC Results display
+        qc_scroll = ttk.Scrollbar(qc_container)
+        qc_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        self.qc_text = tk.Text(qc_container, yscrollcommand=qc_scroll.set,
+                               font=("Consolas", 9), bg=self.bg_tertiary,
+                               fg=self.text_primary, relief=tk.FLAT,
+                               borderwidth=0, padx=12, pady=12,
+                               insertbackground=self.bg_accent)
+        self.qc_text.pack(fill=tk.BOTH, expand=True)
+        qc_scroll.config(command=self.qc_text.yview)
     
     def refresh_image_list(self):
         """Refresh list of unprocessed images"""
@@ -1347,9 +1578,525 @@ FEATURE CONTRIBUTIONS:
         self.consist_text.delete("1.0", tk.END)
         self.consist_text.insert("1.0", output)
 
+    # ==================== BREAD TYPE PROFILE METHODS ====================
+    
+    def _on_bread_type_change(self, event=None):
+        """Handle bread type selection change"""
+        selected_display_name = self.bread_type_var.get()
+        bread_types = self.qc_manager.get_all_bread_types()
+        
+        # Find the key for this display name
+        for key, display_name in bread_types.items():
+            if display_name == selected_display_name:
+                self.qc_manager.set_bread_type(key)
+                self.set_status(f"✓ Switched to {display_name} profile", self.success_color)
+                break
+    
+    def qc_view_bread_profile(self):
+        """Display the current bread type profile"""
+        profile = self.qc_manager.get_current_profile()
+        bread_type = self.qc_manager.current_bread_type
+        
+        output = f"BREAD TYPE PROFILE: {profile.get('display_name', bread_type).upper()}\n"
+        output += "=" * 70 + "\n\n"
+        
+        output += "POROSITY STANDARDS:\n"
+        output += "-" * 70 + "\n"
+        output += f"  Target Range:   {profile['porosity_target_min']:.1f}% - {profile['porosity_target_max']:.1f}%\n"
+        output += f"  Warning Range:  {profile['porosity_warning_min']:.1f}% - {profile['porosity_warning_max']:.1f}%\n\n"
+        
+        output += "HOLE METRICS:\n"
+        output += "-" * 70 + "\n"
+        output += f"  Count Target:   {profile['hole_count_target_min']:.0f} - {profile['hole_count_target_max']:.0f} holes\n"
+        output += f"  Diameter Target: {profile['hole_diameter_target_min']:.1f}mm - {profile['hole_diameter_target_max']:.1f}mm\n\n"
+        
+        output += "UNIFORMITY:\n"
+        output += "-" * 70 + "\n"
+        output += f"  Minimum Score:  {profile['uniformity_acceptable_min']:.2f}\n"
+        output += f"  Batch CV Max:   {profile['consistency_cv_max']*100:.1f}%\n\n"
+        
+        output += "QUALITY GRADES:\n"
+        output += "-" * 70 + "\n"
+        grades = profile['quality_grades']
+        for grade_name in ['excellent', 'good', 'fair', 'poor']:
+            grade_spec = grades[grade_name]
+            p_min, p_max = grade_spec['porosity']
+            u_min, u_max = grade_spec['uniformity']
+            output += f"  {grade_name.upper():<10} Porosity: {p_min:.0f}-{p_max:.0f}%  Uniformity: {u_min:.2f}-{u_max:.2f}\n"
+        
+        self.qc_text.delete(1.0, tk.END)
+        self.qc_text.insert(1.0, output)
+        self.set_status(f"✓ Profile displayed: {profile.get('display_name', bread_type)}", self.success_color)
+    
+    def qc_edit_bread_profile(self):
+        """Edit the current bread type profile"""
+        profile = self.qc_manager.get_current_profile()
+        bread_type = self.qc_manager.current_bread_type
+        
+        try:
+            # Create a configuration dialog
+            config_window = tk.Toplevel(self.root)
+            config_window.title(f"Edit Profile: {profile.get('display_name', bread_type)}")
+            config_window.geometry("700x800")
+            
+            # Profile name
+            ttk.Label(config_window, text="Profile Name:").pack(anchor=tk.W, padx=10, pady=(10, 0))
+            name_entry = ttk.Entry(config_window)
+            name_entry.insert(0, profile.get('display_name', bread_type))
+            name_entry.pack(fill=tk.X, padx=10, pady=(0, 10))
+            
+            # Editable fields display
+            config_text = tk.Text(config_window, font=("Consolas", 9), height=25)
+            config_text.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
+            
+            # Show key settings as text
+            config_display = f"""POROSITY TARGETS (%)
+porosity_target_min: {profile.get('porosity_target_min', 20.0)}
+porosity_target_max: {profile.get('porosity_target_max', 35.0)}
+porosity_warning_min: {profile.get('porosity_warning_min', 18.0)}
+porosity_warning_max: {profile.get('porosity_warning_max', 37.0)}
+
+HOLE METRICS
+hole_count_target_min: {profile.get('hole_count_target_min', 100)}
+hole_count_target_max: {profile.get('hole_count_target_max', 400)}
+hole_diameter_target_min: {profile.get('hole_diameter_target_min', 2.0)}
+hole_diameter_target_max: {profile.get('hole_diameter_target_max', 8.0)}
+
+UNIFORMITY & CONSISTENCY
+uniformity_acceptable_min: {profile.get('uniformity_acceptable_min', 0.7)}
+consistency_cv_max: {profile.get('consistency_cv_max', 0.15)}
+
+Edit values above (format: key: value)
+"""
+            config_text.insert(1.0, config_display)
+            
+            # Buttons
+            button_frame = ttk.Frame(config_window)
+            button_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+            
+            def save_profile_changes():
+                """Save changes to the profile"""
+                try:
+                    # Parse the edited values
+                    edited_text = config_text.get(1.0, tk.END)
+                    
+                    # Simple parser for key: value format
+                    for line in edited_text.split('\n'):
+                        if ':' in line and not line.strip().startswith('#'):
+                            key, value = line.split(':', 1)
+                            key = key.strip()
+                            value_str = value.strip()
+                            
+                            # Try to convert to appropriate type
+                            try:
+                                if '_min' in key or '_max' in key:
+                                    value = float(value_str)
+                                    self.qc_manager.update_threshold(key, min_val=value if '_min' in key else None,
+                                                                    max_val=value if '_max' in key else None,
+                                                                    bread_type=bread_type)
+                            except (ValueError, KeyError):
+                                pass
+                    
+                    messagebox.showinfo("Success", "Profile updated!")
+                    config_window.destroy()
+                    self.qc_view_bread_profile()  # Refresh display
+                
+                except Exception as e:
+                    messagebox.showerror("Error", f"Could not save profile:\n\n{str(e)}")
+            
+            ttk.Button(button_frame, text="Save Changes", command=save_profile_changes).pack(side=tk.LEFT, padx=(0, 5))
+            ttk.Button(button_frame, text="Cancel", command=config_window.destroy).pack(side=tk.LEFT)
+        
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not open profile editor:\n\n{str(e)}")
+
+    # ==================== EXPORT & REPORTING METHODS ====================
+    
+    def export_batch_csv(self):
+        """Export analysis history to CSV"""
+        if not self.analysis_history:
+            messagebox.showwarning("No Data", "Please analyze at least one image first")
+            return
+        
+        try:
+            output_path = self.export_engine.export_to_csv(
+                self.analysis_history,
+                filename=f"batch_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+            )
+            
+            result_msg = f"✅ CSV export successful!\n\nFile: {output_path.name}\n\nLocation: {self.output_dir}"
+            self.export_text.delete(1.0, tk.END)
+            self.export_text.insert(1.0, result_msg)
+            
+            messagebox.showinfo("Export Complete", result_msg)
+            self.set_status(f"✓ CSV exported: {output_path.name}", self.success_color)
+        
+        except Exception as e:
+            error_msg = f"CSV export failed:\n\n{str(e)}"
+            self.export_text.delete(1.0, tk.END)
+            self.export_text.insert(1.0, error_msg)
+            messagebox.showerror("Export Error", error_msg)
+            self.set_status("✗ CSV export failed", self.error_color)
+    
+    def export_batch_excel(self):
+        """Export analysis history to Excel with charts"""
+        if not self.analysis_history:
+            messagebox.showwarning("No Data", "Please analyze at least one image first")
+            return
+        
+        try:
+            output_path = self.export_engine.export_to_excel(
+                self.analysis_history,
+                filename=f"batch_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+            )
+            
+            if output_path:
+                result_msg = f"✅ Excel export successful!\n\nFile: {output_path.name}\n\nLocation: {self.output_dir}\n\nFeatures:\n• Summary sheet with statistics\n• Detailed results sheet\n• Analysis data"
+                self.export_text.delete(1.0, tk.END)
+                self.export_text.insert(1.0, result_msg)
+                
+                messagebox.showinfo("Export Complete", result_msg)
+                self.set_status(f"✓ Excel exported: {output_path.name}", self.success_color)
+            else:
+                messagebox.showwarning("Export", "Excel export not available. Install openpyxl:\npip install openpyxl")
+        
+        except Exception as e:
+            error_msg = f"Excel export failed:\n\n{str(e)}"
+            self.export_text.delete(1.0, tk.END)
+            self.export_text.insert(1.0, error_msg)
+            messagebox.showerror("Export Error", error_msg)
+            self.set_status("✗ Excel export failed", self.error_color)
+    
+    def export_batch_pdf(self):
+        """Generate PDF report from analysis history"""
+        if not self.analysis_history:
+            messagebox.showwarning("No Data", "Please analyze at least one image first")
+            return
+        
+        try:
+            output_path = self.export_engine.export_to_pdf(
+                self.analysis_history,
+                filename=f"batch_analysis_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
+                title="Bread Porosity Analysis Report"
+            )
+            
+            if output_path:
+                result_msg = f"✅ PDF report generated successfully!\n\nFile: {output_path.name}\n\nLocation: {self.output_dir}\n\nReport includes:\n• Summary statistics\n• Detailed results table\n• Analysis information"
+                self.export_text.delete(1.0, tk.END)
+                self.export_text.insert(1.0, result_msg)
+                
+                messagebox.showinfo("Export Complete", result_msg)
+                self.set_status(f"✓ PDF report generated: {output_path.name}", self.success_color)
+            else:
+                messagebox.showwarning("Export", "PDF export not available. Install reportlab:\npip install reportlab")
+        
+        except Exception as e:
+            error_msg = f"PDF export failed:\n\n{str(e)}"
+            self.export_text.delete(1.0, tk.END)
+            self.export_text.insert(1.0, error_msg)
+            messagebox.showerror("Export Error", error_msg)
+            self.set_status("✗ PDF export failed", self.error_color)
+    
+    def create_summary_charts(self):
+        """Create summary charts from analysis history"""
+        if not self.analysis_history:
+            messagebox.showwarning("No Data", "Please analyze at least one image first")
+            return
+        
+        try:
+            chart_paths = self.export_engine.create_summary_charts(self.analysis_history)
+            
+            if chart_paths:
+                result_msg = "✅ Summary charts created!\n\n"
+                result_msg += "Charts generated:\n"
+                for chart_name, path in chart_paths.items():
+                    result_msg += f"  • {chart_name}: {path.name}\n"
+                result_msg += f"\nLocation: {self.output_dir}"
+                
+                self.export_text.delete(1.0, tk.END)
+                self.export_text.insert(1.0, result_msg)
+                
+                messagebox.showinfo("Charts Created", result_msg)
+                self.set_status(f"✓ {len(chart_paths)} charts created", self.success_color)
+            else:
+                messagebox.showwarning("Charts", "No charts were created")
+        
+        except Exception as e:
+            error_msg = f"Chart creation failed:\n\n{str(e)}"
+            self.export_text.delete(1.0, tk.END)
+            self.export_text.insert(1.0, error_msg)
+            messagebox.showerror("Error", error_msg)
+            self.set_status("✗ Chart creation failed", self.error_color)
+    
+    # ==================== QUALITY CONTROL METHODS ====================
+    
+    def qc_evaluate_current(self):
+        """Evaluate the current analysis with quality control"""
+        if not self.analysis_result:
+            messagebox.showwarning("No Analysis", "Please analyze an image first")
+            return
+        
+        try:
+            metrics = self.analysis_result.get('metrics', {})
+            evaluation = self.qc_manager.evaluate_analysis(metrics, recipe_id=self.current_recipe_id)
+            
+            # Add to history
+            analysis_with_qc = self.analysis_result.copy()
+            analysis_with_qc['qc_evaluation'] = evaluation
+            self.analysis_history.append(analysis_with_qc)
+            
+            # Display evaluation
+            output = "QUALITY CONTROL EVALUATION\n"
+            output += "=" * 70 + "\n\n"
+            
+            output += "ACCEPTANCE STATUS:\n"
+            output += "-" * 70 + "\n"
+            acceptance = evaluation['acceptance']
+            output += f"  Porosity:    {'✅ PASS' if acceptance['porosity_ok'] else '❌ FAIL'}\n"
+            output += f"  Holes:       {'✅ PASS' if acceptance['holes_ok'] else '❌ FAIL'}\n"
+            output += f"  Uniformity:  {'✅ PASS' if acceptance['uniformity_ok'] else '❌ FAIL'}\n"
+            output += f"  OVERALL:     {'✅ ACCEPT' if acceptance['overall_ok'] else '⚠️  REVIEW NEEDED'}\n\n"
+            
+            output += f"QUALITY GRADE: {evaluation['grade']}\n\n"
+            
+            # Scores
+            output += "QUALITY SCORES:\n"
+            output += "-" * 70 + "\n"
+            for param, score in evaluation['scores'].items():
+                bar = "█" * int(score * 10) + "░" * (10 - int(score * 10))
+                output += f"  {param:15} {score:.2f}  [{bar}]\n"
+            output += "\n"
+            
+            # Alerts
+            if evaluation['alerts']:
+                output += "⚠️  ALERTS:\n"
+                output += "-" * 70 + "\n"
+                for alert in evaluation['alerts']:
+                    output += f"  {alert}\n"
+                output += "\n"
+            
+            # Recommendations
+            if evaluation['recommendations']:
+                output += "💡 RECOMMENDATIONS:\n"
+                output += "-" * 70 + "\n"
+                for rec in evaluation['recommendations']:
+                    output += f"  {rec}\n"
+            
+            self.qc_text.delete(1.0, tk.END)
+            self.qc_text.insert(1.0, output)
+            
+            self.set_status(f"✓ QC evaluation complete: {evaluation['grade']}", self.success_color)
+        
+        except Exception as e:
+            error_msg = f"QC evaluation failed:\n\n{str(e)}"
+            self.qc_text.delete(1.0, tk.END)
+            self.qc_text.insert(1.0, error_msg)
+            messagebox.showerror("QC Error", error_msg)
+            self.set_status("✗ QC evaluation failed", self.error_color)
+    
+    def qc_batch_consistency(self):
+        """Check consistency across batch of analyses"""
+        if not self.analysis_history:
+            messagebox.showwarning("No Data", "Please analyze multiple images first")
+            return
+        
+        try:
+            report = self.qc_manager.check_batch_consistency(self.analysis_history)
+            
+            output = "BATCH CONSISTENCY ANALYSIS\n"
+            output += "=" * 70 + "\n\n"
+            
+            output += f"Samples Analyzed: {report.get('num_samples', 0)}\n"
+            output += f"Status: {report.get('consistency_verdict', 'N/A')}\n"
+            output += f"Message: {report.get('message', 'N/A')}\n\n"
+            
+            output += "POROSITY STATISTICS:\n"
+            output += "-" * 70 + "\n"
+            porosity = report.get('porosity', {})
+            output += f"  Mean:          {porosity.get('mean', 0):.2f}%\n"
+            output += f"  Std Dev:       {porosity.get('stdev', 0):.2f}%\n"
+            output += f"  CV (Target <15%): {porosity.get('cv_percent', 0):.2f}%\n"
+            output += f"  Range:         {porosity.get('min', 0):.2f}% - {porosity.get('max', 0):.2f}%\n\n"
+            
+            output += "HOLE METRICS:\n"
+            output += "-" * 70 + "\n"
+            holes = report.get('holes', {})
+            output += f"  Mean Count:    {holes.get('mean', 0):.0f}\n"
+            output += f"  Std Dev:       {holes.get('stdev', 0):.0f}\n"
+            output += f"  Range:         {holes.get('min', 0):.0f} - {holes.get('max', 0):.0f}\n\n"
+            
+            output += "UNIFORMITY METRICS:\n"
+            output += "-" * 70 + "\n"
+            uniformity = report.get('uniformity', {})
+            output += f"  Mean:          {uniformity.get('mean', 0):.2f}\n"
+            output += f"  Range:         {uniformity.get('min', 0):.2f} - {uniformity.get('max', 0):.2f}\n"
+            
+            self.qc_text.delete(1.0, tk.END)
+            self.qc_text.insert(1.0, output)
+            
+            verdict = "✓" if report.get('is_consistent') else "⚠️"
+            self.set_status(f"{verdict} Batch consistency check complete", self.success_color)
+        
+        except Exception as e:
+            error_msg = f"Batch consistency check failed:\n\n{str(e)}"
+            self.qc_text.delete(1.0, tk.END)
+            self.qc_text.insert(1.0, error_msg)
+            messagebox.showerror("Error", error_msg)
+            self.set_status("✗ Consistency check failed", self.error_color)
+    
+    def qc_spc_statistics(self):
+        """Display SPC (Statistical Process Control) statistics"""
+        try:
+            spc = self.qc_manager.get_spc_statistics()
+            
+            output = "STATISTICAL PROCESS CONTROL (SPC)\n"
+            output += "=" * 70 + "\n\n"
+            
+            if spc.get('status') == 'no_data':
+                output += "No historical data yet. Analyze more images to build SPC charts.\n"
+            else:
+                output += f"Samples in History: {spc.get('samples', 0)}\n"
+                output += f"Mean Porosity: {spc.get('mean', 0):.2f}%\n"
+                output += f"Std Deviation: {spc.get('stdev', 0):.2f}%\n\n"
+                
+                output += "CONTROL LIMITS (±3σ):\n"
+                output += "-" * 70 + "\n"
+                cl = spc.get('control_limits', {})
+                output += f"  Upper Control Limit (UCL): {cl.get('ucl', 0):.2f}%\n"
+                output += f"  Lower Control Limit (LCL): {cl.get('lcl', 0):.2f}%\n\n"
+                
+                output += "WARNING LIMITS (±2σ):\n"
+                output += "-" * 70 + "\n"
+                wl = spc.get('warning_limits', {})
+                output += f"  Upper Warning Limit (UWL): {wl.get('uwl', 0):.2f}%\n"
+                output += f"  Lower Warning Limit (LWL): {wl.get('lwl', 0):.2f}%\n\n"
+                
+                output += f"RECENT TREND: {spc.get('recent_trend', 'unknown')}\n"
+                output += "\nUse these limits to monitor process stability over time.\n"
+                output += "Points outside control limits indicate process drift.\n"
+            
+            self.qc_text.delete(1.0, tk.END)
+            self.qc_text.insert(1.0, output)
+            
+            self.set_status("✓ SPC statistics displayed", self.success_color)
+        
+        except Exception as e:
+            error_msg = f"SPC calculation failed:\n\n{str(e)}"
+            self.qc_text.delete(1.0, tk.END)
+            self.qc_text.insert(1.0, error_msg)
+            messagebox.showerror("Error", error_msg)
+            self.set_status("✗ SPC calculation failed", self.error_color)
+    
+    def qc_view_alerts(self):
+        """View all active QC alerts"""
+        try:
+            alerts = self.qc_manager.get_alerts(limit=20)
+            
+            output = "QUALITY CONTROL ALERTS\n"
+            output += "=" * 70 + "\n\n"
+            
+            if alerts:
+                output += f"Total Active Alerts: {len(alerts)}\n\n"
+                for i, alert in enumerate(alerts, 1):
+                    output += f"{i}. {alert}\n"
+            else:
+                output += "✅ No active alerts\n"
+            
+            self.qc_text.delete(1.0, tk.END)
+            self.qc_text.insert(1.0, output)
+            
+            status_msg = f"✓ Viewing {len(alerts)} alerts"
+            self.set_status(status_msg, self.success_color)
+        
+        except Exception as e:
+            error_msg = f"Alert retrieval failed:\n\n{str(e)}"
+            self.qc_text.delete(1.0, tk.END)
+            self.qc_text.insert(1.0, error_msg)
+    
+    def qc_configure_thresholds(self):
+        """Configure QC thresholds"""
+        try:
+            # Create a simple configuration dialog
+            config_window = tk.Toplevel(self.root)
+            config_window.title("Quality Control Configuration")
+            config_window.geometry("600x700")
+            
+            # Current config display
+            config_frame = ttk.LabelFrame(config_window, text="Current Thresholds", padding=12)
+            config_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+            
+            config_text = tk.Text(config_frame, font=("Consolas", 9), height=20)
+            config_text.pack(fill=tk.BOTH, expand=True)
+            
+            # Display current config
+            config_display = json.dumps(self.qc_manager.config, indent=2)
+            config_text.insert(1.0, config_display)
+            
+            # Buttons
+            button_frame = ttk.Frame(config_window)
+            button_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+            
+            ttk.Button(button_frame, text="Save Changes", 
+                      command=lambda: self._save_qc_config(config_text, config_window)).pack(side=tk.LEFT, padx=(0, 5))
+            ttk.Button(button_frame, text="Reset to Defaults", 
+                      command=lambda: self._reset_qc_config(config_text)).pack(side=tk.LEFT, padx=(0, 5))
+            ttk.Button(button_frame, text="Close", 
+                      command=config_window.destroy).pack(side=tk.LEFT)
+        
+        except Exception as e:
+            messagebox.showerror("Configuration Error", f"Error opening QC config:\n\n{str(e)}")
+    
+    def _save_qc_config(self, config_text, window):
+        """Save modified QC configuration"""
+        try:
+            config_str = config_text.get(1.0, tk.END)
+            new_config = json.loads(config_str)
+            self.qc_manager.config = new_config
+            self.qc_manager.save_config()
+            
+            messagebox.showinfo("Success", "QC configuration saved!")
+            self.set_status("✓ QC thresholds updated", self.success_color)
+            window.destroy()
+        
+        except json.JSONDecodeError as e:
+            messagebox.showerror("JSON Error", f"Invalid JSON format:\n\n{str(e)}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not save config:\n\n{str(e)}")
+    
+    def _reset_qc_config(self, config_text):
+        """Reset QC configuration to defaults"""
+        try:
+            # Recreate default config
+            self.qc_manager.config = {
+                "porosity_target_min": 20.0,
+                "porosity_target_max": 35.0,
+                "porosity_warning_min": 18.0,
+                "porosity_warning_max": 37.0,
+                "hole_count_target_min": 100,
+                "hole_count_target_max": 400,
+                "hole_diameter_target_min": 2.0,
+                "hole_diameter_target_max": 8.0,
+                "uniformity_acceptable_min": 0.7,
+                "consistency_cv_max": 0.15,
+                "consecutive_failures_limit": 3,
+                "quality_grades": {
+                    "excellent": {"porosity": [25, 32], "uniformity": [0.85, 1.0]},
+                    "good": {"porosity": [22, 35], "uniformity": [0.75, 0.95]},
+                    "fair": {"porosity": [18, 38], "uniformity": [0.65, 0.85]},
+                    "poor": {"porosity": [0, 100], "uniformity": [0.0, 1.0]},
+                }
+            }
+            
+            config_text.delete(1.0, tk.END)
+            config_text.insert(1.0, json.dumps(self.qc_manager.config, indent=2))
+            messagebox.showinfo("Reset", "Configuration reset to defaults")
+        
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not reset config:\n\n{str(e)}")
 
 
 def main():
+    from datetime import datetime
     root = tk.Tk()
     app = BreadPorositytoolGUI(root)
     app.refresh_recipe_list()
@@ -1358,3 +2105,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
