@@ -20,6 +20,12 @@ from defect_detection import DefectDetector
 from ml_simple import SimpleMLClassifier
 import traceback
 
+# NEW: Import usability improvements
+from first_run_wizard import FirstRunWizard
+from image_quality_validator import ImageQualityValidator
+from result_presenter import ResultPresenter
+from recipe_builder_form import RecipeBuilderForm
+
 
 class BreadPorositytoolGUI:
     def __init__(self, root):
@@ -132,6 +138,13 @@ class BreadPorositytoolGUI:
         # Initialize export and quality control managers
         self.export_engine = ExportEngine(output_dir=str(self.output_dir))
         self.qc_manager = QualityControlManager(config_file="qc_config.json")
+        
+        # NEW: Initialize usability modules
+        self.image_quality_validator = ImageQualityValidator(verbose=False)
+        self.result_presenter = ResultPresenter(simple_mode=True)  # Start in simple mode
+        
+        # NEW: Show first-run wizard if needed
+        self._check_first_run()
         
         self.current_image = None
         self.current_image_path = None
@@ -954,6 +967,11 @@ class BreadPorositytoolGUI:
     def analyze_single_image(self):
         """Analyze single image"""
         try:
+            # NEW: Validate image quality first
+            if not self._validate_image_quality_before_analysis(str(self.current_image_path)):
+                self.set_status("✗ Image quality insufficient", color=self.warning_color)
+                return
+            
             self.progress.start()
             self.analyze_btn.config(state=tk.DISABLED)
             self.set_status("Analyzing image...", color=self.warning_color)
@@ -1039,58 +1057,16 @@ class BreadPorositytoolGUI:
     
     def display_results(self, result):
         """Display single image analysis results"""
-        metrics = result['metrics']
+        self.analysis_result = result
         
-        results_text = f"""
-BREAD POROSITY ANALYSIS RESULTS
-{'='*50}
-
-IMAGE: {Path(result['image_path']).name}
-Pixel Size: {result['pixel_size_mm']:.2f} mm
-
-POROSITY
-────────────────────────────────
-  Porosity:           {metrics['porosity_percent']:.2f}%
-  Hole pixels:        {metrics['hole_pixels']:,}
-  Crumb pixels:       {metrics['crumb_pixels']:,}
-
-HOLE METRICS
-────────────────────────────────
-  Number of holes:    {metrics['num_holes']}
-  Mean diameter:      {metrics['mean_hole_diameter_mm']:.2f} mm
-  Max diameter:       {metrics['largest_hole_diameter_mm']:.2f} mm
-  Min diameter:       {metrics['smallest_hole_diameter_mm']:.2f} mm
-  Uniformity (CV):    {metrics['hole_area_cv']:.3f}
-  Holes per cm²:      {metrics['holes_per_cm2']:.1f}
-
-SHAPE ANALYSIS
-────────────────────────────────
-  Mean aspect ratio:  {metrics['mean_aspect_ratio']:.2f}
-  Aspect ratio std:   {metrics['aspect_ratio_std']:.2f}
-  Mean orientation:   {metrics['mean_orientation_deg']:.1f}°
-  Orientation entropy:{metrics['orientation_entropy']:.2f} / 4.17
-
-CRUMB UNIFORMITY
-────────────────────────────────
-  Brightness mean:    {metrics['crumb_brightness_mean']:.1f}
-  Brightness std:     {metrics['crumb_brightness_std']:.1f}
-  Brightness CV:      {metrics['crumb_brightness_cv']:.3f}
-  Brightness skew:    {metrics['crumb_brightness_skewness']:.2f}
-
-OUTPUT FILES
-────────────────────────────────
-  Comparison:         {Path(result['output_files']['comparison']).name}
-  Distributions:      {Path(result['output_files']['distributions']).name}
-  Annotated:          {Path(result['output_files']['annotated']).name}
-  Metrics JSON:       {Path(result['output_files']['metrics_json']).name}
-
-"""
+        # NEW: Use result presenter for formatted output
+        formatted_results = self.result_presenter.format_results(result)
         
         self.results_text.delete(1.0, tk.END)
-        self.results_text.insert(1.0, results_text)
+        self.results_text.insert(1.0, formatted_results)
         
-        # Display metrics JSON
-        metrics_json = json.dumps(metrics, indent=2)
+        # Display metrics JSON in metrics tab
+        metrics_json = json.dumps(result.get('metrics', {}), indent=2)
         self.metrics_text.delete(1.0, tk.END)
         self.metrics_text.insert(1.0, metrics_json)
         
@@ -1220,53 +1196,35 @@ SLICE-BY-SLICE
             self.current_recipe_id = recipes[selection[0]]['id']
     
     def log_new_recipe(self):
-        """Parse and log a new recipe from the input text"""
+        """Show recipe builder form to create new recipe"""
+        # Use the form-based recipe builder instead of JSON
+        self.show_recipe_builder()
+    
+    def _on_recipe_saved(self, recipe_data):
+        """Callback when recipe builder form saves a recipe"""
         try:
-            recipe_text = self.recipe_input_text.get(1.0, tk.END).strip()
-            
-            # Extract JSON content
-            import json
-            start = recipe_text.find('{')
-            end = recipe_text.rfind('}') + 1
-            
-            if start == -1 or end == 0:
-                messagebox.showerror("Error", "Could not find JSON in recipe input")
-                return
-            
-            json_str = recipe_text[start:end]
-            recipe_data = json.loads(json_str)
-            
-            # Validate required fields
-            required = ['name', 'ingredients', 'mixing_time_min', 'proof_time_min',
-                       'oven_temp_c', 'cooking_vessel', 'cook_time_min']
-            for field in required:
-                if field not in recipe_data:
-                    messagebox.showerror("Error", f"Missing required field: {field}")
-                    return
-            
             # Add recipe to database with environmental parameters
             recipe = self.recipe_db.add_recipe(
                 recipe_name=recipe_data['name'],
                 ingredients=recipe_data['ingredients'],
-                mixing_time_min=float(recipe_data['mixing_time_min']),
-                proof_time_min=float(recipe_data['proof_time_min']),
-                oven_temp_c=float(recipe_data['oven_temp_c']),
-                cooking_vessel=recipe_data['cooking_vessel'],
-                cook_time_min=float(recipe_data['cook_time_min']),
+                mixing_time_min=float(recipe_data.get('mixing_time_min', 0)),
+                proof_time_min=float(recipe_data.get('proof_time_min', 0)),
+                oven_temp_c=float(recipe_data.get('oven_temp_c', 0)),
+                cooking_vessel=recipe_data.get('cooking_vessel', 'dutch oven'),
+                cook_time_min=float(recipe_data.get('cook_time_min', 0)),
                 notes=recipe_data.get('notes', ''),
                 room_temp_c=float(recipe_data.get('room_temp_c')) if recipe_data.get('room_temp_c') else None,
                 room_humidity_pct=float(recipe_data.get('room_humidity_pct')) if recipe_data.get('room_humidity_pct') else None,
-                altitude_m=float(recipe_data.get('altitude_m')) if recipe_data.get('altitude_m') else None
+                altitude_m=float(recipe_data.get('altitude_m')) if recipe_data.get('altitude_m') else None,
+                bread_type=recipe_data.get('type', 'other')
             )
             
             self.refresh_recipe_list()
             self.set_status(f" Recipe logged: {recipe['name']}", self.success_color)
             messagebox.showinfo("Success", f"Recipe '{recipe['name']}' saved!\n\nRecipe ID: {recipe['id']}\n\nNow analyze an image and save the porosity result.")
         
-        except json.JSONDecodeError as e:
-            messagebox.showerror("JSON Error", f"Invalid JSON format:\n{str(e)}")
         except Exception as e:
-            messagebox.showerror("Error", f"Could not log recipe:\n{str(e)}")
+            messagebox.showerror("Error", f"Could not save recipe:\n{str(e)}")
     
     def create_recipe_variant(self):
         """Create a variant of the current recipe"""
@@ -2330,6 +2288,100 @@ Edit values above (format: key: value)
         
         except Exception as e:
             messagebox.showerror("Error", f"Could not reset config:\n\n{str(e)}")
+
+    # ==================== NEW: FIRST-RUN & USABILITY FEATURES ====================
+    
+    def _check_first_run(self):
+        """Check if first-run wizard should be shown."""
+        config_path = Path("config.json")
+        if config_path.exists():
+            try:
+                with open(config_path, 'r') as f:
+                    config = json.load(f)
+                    if not config.get("first_run_complete", False):
+                        self._show_first_run_wizard()
+            except:
+                self._show_first_run_wizard()
+        else:
+            self._show_first_run_wizard()
+    
+    def _show_first_run_wizard(self):
+        """Launch first-run setup wizard."""
+        wizard = FirstRunWizard(self.root, "config.json")
+        if wizard.should_show_wizard():
+            wizard.run_wizard()
+    
+    def _validate_image_quality_before_analysis(self, image_path: str) -> bool:
+        """
+        Validate image quality before analysis. Show user feedback.
+        Returns True if image is good enough to analyze.
+        """
+        validation = self.image_quality_validator.validate_image(image_path)
+        
+        # Show validation report
+        self.image_quality_validator.print_report(validation)
+        
+        if not validation['can_proceed']:
+            messagebox.showwarning("Image Quality",
+                                 f"Image quality score: {validation['score']}/1.0\n\n"
+                                 f"Status: {validation['overall_status']}\n\n"
+                                 f"Recommendations:\n" +
+                                 "\n".join(validation['recommendations'][:3]))
+            return False
+        
+        if validation['score'] < 0.85:
+            result = messagebox.askyesno("Suboptimal Image",
+                                        f"Image quality is {validation['score']:.0%}.\n\n"
+                                        f"Continue anyway?")
+            return result
+        
+        return True
+    
+    def toggle_results_view(self):
+        """Toggle between simple and advanced results view."""
+        self.result_presenter.toggle_mode()
+        mode = "SIMPLE" if self.result_presenter.simple_mode else "ADVANCED"
+        messagebox.showinfo("View Toggled", f"Switched to {mode} view")
+        
+        # Refresh results if available
+        if self.analysis_result:
+            self._display_results_formatted()
+    
+    def _display_results_formatted(self):
+        """Display results using formatted presenter."""
+        if not self.analysis_result:
+            return
+        
+        formatted = self.result_presenter.format_results(self.analysis_result)
+        self.results_text.delete(1.0, tk.END)
+        self.results_text.insert(1.0, formatted)
+    
+    def show_recipe_builder(self):
+        """Show form-based recipe builder instead of JSON input."""
+        def on_save(recipe_dict):
+            try:
+                saved_recipe = self.recipe_db.add_recipe(
+                    recipe_name=recipe_dict.get('name'),
+                    ingredients=recipe_dict.get('ingredients', {}),
+                    mixing_time_min=recipe_dict.get('mixing_time_min', 10),
+                    proof_time_min=recipe_dict.get('proof_time_min', 480),
+                    oven_temp_c=recipe_dict.get('oven_temp_c', 450),
+                    cooking_vessel=recipe_dict.get('cooking_vessel', 'Dutch oven'),
+                    cook_time_min=recipe_dict.get('cook_time_min', 40),
+                    notes=recipe_dict.get('notes', ''),
+                    room_temp_c=recipe_dict.get('room_temp_c'),
+                    room_humidity_pct=recipe_dict.get('room_humidity_pct'),
+                    altitude_m=recipe_dict.get('altitude_m')
+                )
+                self.refresh_recipe_list()
+                return True
+            except Exception as e:
+                messagebox.showerror("Error", f"Could not save recipe: {str(e)}")
+                return False
+        
+        builder = RecipeBuilderForm(self.root, on_save_callback=on_save)
+        builder.show()
+
 
 
 def main():
