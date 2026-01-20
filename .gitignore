@@ -1,8 +1,12 @@
-# Directories with user data
+# Directories with user data (ignore contents but keep .gitkeep)
 unprocessed/
+!unprocessed/.gitkeep
 processed/
+!processed/.gitkeep
 results/
+!results/.gitkeep
 output/
+!output/.gitkeep
 
 # Python
 __pycache__/
