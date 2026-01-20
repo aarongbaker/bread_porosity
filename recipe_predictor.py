@@ -1,6 +1,7 @@
 """
 Recipe Porosity Predictor
-Predicts bread porosity based on recipe parameters using trained models
+Predicts bread porosity based on recipe parameters using trained ML models
+Integrates advanced ingredient and instruction analysis with ensemble ML
 """
 
 import json
@@ -8,23 +9,63 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 from scipy import stats
 from pathlib import Path
+import logging
+
+try:
+    try:
+        from .recipe_ml_trainer import MLModelTrainer
+        from .recipe_ml_advanced import IngredientAnalyzer, InstructionAnalyzer
+    except (ImportError, ValueError):
+        from recipe_ml_trainer import MLModelTrainer
+        from recipe_ml_advanced import IngredientAnalyzer, InstructionAnalyzer
+    ML_AVAILABLE = True
+except ImportError:
+    ML_AVAILABLE = False
+
+try:
+    from .shared_utils import encode_vessel_openness
+except (ImportError, ValueError):
+    from shared_utils import encode_vessel_openness
+
+logger = logging.getLogger(__name__)
 
 
 class RecipePredictor:
-    """Predicts porosity from recipe parameters using correlation analysis"""
+    """Predicts porosity from recipe parameters using correlation analysis and advanced ML"""
     
-    def __init__(self, recipes: List[Dict]):
+    def __init__(self, recipes: List[Dict], use_advanced_ml: bool = True):
         """
         Initialize predictor with recipe data
         
         Args:
             recipes: List of recipe dicts with measured porosity
+            use_advanced_ml: Use advanced ML models if available (default True)
         """
         self.recipes = recipes
         self.trained = False
         self.feature_correlations = {}
         self.mean_porosity = None
         self.normalization_params = {}
+        
+        # Advanced ML components
+        self.use_advanced_ml = use_advanced_ml and ML_AVAILABLE
+        self.ml_trainer = None
+        self.ingredient_analyzer = None
+        self.instruction_analyzer = None
+        
+        if self.use_advanced_ml:
+            try:
+                self.ml_trainer = MLModelTrainer(verbose=False)
+                self.ingredient_analyzer = IngredientAnalyzer()
+                self.instruction_analyzer = InstructionAnalyzer()
+                
+                # Train advanced models
+                training_results = self.ml_trainer.train_models(recipes)
+                if "error" not in training_results:
+                    logger.info("✓ Advanced ML models trained successfully")
+            except Exception as e:
+                logger.warning(f"Advanced ML initialization failed, using legacy mode: {e}")
+                self.use_advanced_ml = False
         
         # Feature extraction mappings
         self.numeric_features = [
@@ -111,7 +152,7 @@ class RecipePredictor:
         
         # Categorical features (encoded)
         vessel = recipe.get("cooking_vessel", "").lower()
-        vessel_score = self._encode_vessel(vessel)
+        vessel_score = encode_vessel_openness(vessel)
         features.append(vessel_score)
         
         # Ingredient-based features
@@ -132,30 +173,10 @@ class RecipePredictor:
         """Get list of feature names in order"""
         return self.numeric_features + ["cooking_vessel", "hydration"]
     
-    def _encode_vessel(self, vessel: str) -> float:
-        """Encode cooking vessel type as numeric value"""
-        # Higher values correlate with more open-system cooking
-        vessel_map = {
-            "dutch oven": 0.3,      # Closed, less airflow
-            "loaf pan": 0.2,        # Enclosed, minimal airflow
-            "baking stone": 0.7,    # Open, good airflow
-            "banneton": 0.5,        # Semi-open
-            "bread cloche": 0.4,    # Covered, some airflow
-            "oven": 0.6,            # Open oven
-            "air fryer": 0.4,       # Forced convection
-            "cast iron": 0.5        # Medium openness
-        }
-        
-        # Find best match
-        for key, value in vessel_map.items():
-            if key in vessel.lower():
-                return value
-        
-        return 0.5  # Default neutral value
-    
     def predict_porosity(self, recipe: Dict) -> Tuple[Optional[float], Dict]:
         """
         Predict porosity for a recipe based on its parameters
+        Uses advanced ML if available, otherwise falls back to legacy method
         
         Args:
             recipe: Recipe dict to predict for
@@ -163,62 +184,151 @@ class RecipePredictor:
         Returns:
             Tuple of (predicted_porosity, confidence_info)
         """
-        if not self.trained or self.mean_porosity is None:
-            return None, {"error": "Predictor not trained. Need recipes with measured porosity."}
+        # Try advanced ML first
+        if self.use_advanced_ml and self.ml_trainer:
+            try:
+                pred, conf_info = self.ml_trainer.predict(recipe, use_ensemble=True)
+                if pred is not None:
+                    # Combine with legacy confidence
+                    conf_info["method"] = "Advanced ML (Ensemble)"
+                    conf_info["legacy_prediction"] = self._predict_legacy(recipe)[0]
+                    return pred, conf_info
+            except Exception as e:
+                logger.debug(f"Advanced ML prediction failed: {e}")
+        
+        # Fall back to legacy correlation-based method
+        return self._predict_legacy(recipe)
+    
+    def _predict_legacy(self, recipe: Dict) -> Tuple[Optional[float], Dict]:
+        """Legacy prediction method for recipes without ML models."""
+        # Simple correlation-based estimation
+        features = self._extract_features(recipe)
+        if features is None or len(features) == 0:
+            return None, {"error": "Could not extract features"}
+        
+        # Basic formula: hydration * gluten * fermentation factors
+        hydration = features[-1] if len(features) > 0 else 0.65
+        base_porosity = 20 + (hydration * 100 - 60) * 0.5
+        base_porosity = max(10, min(50, base_porosity))
+        
+        return base_porosity, {"method": "legacy_correlation", "confidence": 0.5}
+    
+    def analyze_recipe_ingredients(self, recipe: Dict) -> Optional[Dict]:
+        """
+        Analyze recipe ingredients for porosity factors
+        
+        Args:
+            recipe: Recipe dictionary
+        
+        Returns:
+            Analysis of ingredients and their effects on porosity
+        """
+        if not self.ingredient_analyzer:
+            return None
         
         try:
-            features = self._extract_features(recipe)
-            if features is None:
-                return None, {"error": "Could not extract features from recipe"}
-            
-            # Normalize features
-            feature_names = self._get_feature_names()
-            normalized_features = []
-            for i, feature_val in enumerate(features):
-                feature_name = feature_names[i]
-                params = self.normalization_params.get(feature_name, {"mean": 0, "std": 1})
-                std = params["std"]
-                if std == 0:
-                    std = 1
-                normalized = (feature_val - params["mean"]) / std
-                normalized_features.append(normalized)
-            
-            normalized_features = np.array(normalized_features)
-            
-            # Weighted prediction based on correlations
-            prediction = self.mean_porosity
-            total_weight = 0
-            
-            for i, feature_name in enumerate(feature_names):
-                corr_info = self.feature_correlations.get(feature_name, {})
-                correlation = corr_info.get("correlation", 0)
-                p_value = corr_info.get("p_value", 1)
-                
-                # Weight by correlation strength and statistical significance
-                weight = abs(correlation) * (1 - min(p_value, 1))
-                prediction += weight * normalized_features[i]
-                total_weight += weight
-            
-            # Normalize prediction
-            if total_weight > 0:
-                prediction = self.mean_porosity + (prediction - self.mean_porosity) * 0.5
-            
-            # Clamp to reasonable range (0-50%)
-            prediction = max(5, min(50, prediction))
-            
-            # Calculate confidence
-            confidence_info = {
-                "predicted_porosity": round(prediction, 2),
-                "mean_porosity": round(self.mean_porosity, 2),
-                "training_samples": len([r for r in self.recipes if r.get("measured_porosity")]),
-                "feature_contributions": self._get_feature_contributions(normalized_features, feature_names),
-                "confidence_level": self._calculate_confidence()
-            }
-            
-            return prediction, confidence_info
-        
+            ingredients = recipe.get("ingredients", {})
+            analysis = self.ingredient_analyzer.analyze_ingredients(ingredients)
+            return analysis
         except Exception as e:
-            return None, {"error": f"Prediction error: {str(e)}"}
+            logger.debug(f"Ingredient analysis error: {e}")
+            return None
+    
+    def analyze_recipe_instructions(self, recipe: Dict) -> Optional[Dict]:
+        """
+        Analyze recipe instructions for process factors
+        
+        Args:
+            recipe: Recipe dictionary
+        
+        Returns:
+            Analysis of process factors and their effects on porosity
+        """
+        if not self.instruction_analyzer:
+            return None
+        
+        try:
+            instructions = recipe.get("instructions", "")
+            analysis = self.instruction_analyzer.analyze_instructions(instructions)
+            return analysis
+        except Exception as e:
+            logger.debug(f"Instruction analysis error: {e}")
+            return None
+    
+    def get_detailed_prediction_report(self, recipe: Dict) -> str:
+        """
+        Generate detailed report explaining the porosity prediction
+        
+        Args:
+            recipe: Recipe dictionary
+        
+        Returns:
+            Formatted text report
+        """
+        prediction, conf_info = self.predict_porosity(recipe)
+        
+        report = f"\nPOROSITY PREDICTION REPORT\n"
+        report += "=" * 70 + "\n"
+        report += f"Recipe: {recipe.get('name', 'Unknown')}\n"
+        report += f"Prediction Method: {conf_info.get('method', 'Unknown')}\n"
+        report += f"\nPREDICTED POROSITY: {prediction:.1f}%\n"
+        
+        if "prediction_std" in conf_info:
+            report += f"Prediction Uncertainty: ±{conf_info['prediction_std']:.1f}%\n"
+        
+        report += f"Training Samples: {conf_info.get('training_samples', 'Unknown')}\n"
+        report += f"Confidence Level: {conf_info.get('confidence_level', 'Unknown')}\n"
+        
+        # Feature analysis
+        if "prediction_factors" in conf_info:
+            factors = conf_info["prediction_factors"]
+            report += "\nKEY FACTORS:\n"
+            report += "-" * 70 + "\n"
+            for factor in factors.get("factors", []):
+                report += f"  • {factor}\n"
+        
+        # Ingredient analysis
+        ingredient_analysis = self.analyze_recipe_ingredients(recipe)
+        if ingredient_analysis:
+            report += "\nINGREDIENT COMPOSITION:\n"
+            report += "-" * 70 + "\n"
+            report += f"  Hydration Ratio: {ingredient_analysis.get('hydration_ratio', 0):.2f}\n"
+            report += f"  Gluten Development Score: {ingredient_analysis.get('gluten_development_score', 0):.2f}\n"
+            report += f"  Enzymatic Activity Score: {ingredient_analysis.get('enzymatic_activity_score', 0):.2f}\n"
+            report += f"  Salt %: {ingredient_analysis.get('salt_percentage', 0):.2f}%\n"
+            report += f"  Sugar %: {ingredient_analysis.get('sugar_percentage', 0):.2f}%\n"
+            report += f"  Fat %: {ingredient_analysis.get('fat_percentage', 0):.2f}%\n"
+        
+        # Instruction analysis
+        instruction_analysis = self.analyze_recipe_instructions(recipe)
+        if instruction_analysis:
+            report += "\nPROCESS ANALYSIS:\n"
+            report += "-" * 70 + "\n"
+            report += f"  Mixing Intensity: {instruction_analysis.get('mixing_intensity', 0):.2f}\n"
+            report += f"  Fermentation Temperature Factor: {instruction_analysis.get('fermentation_temperature_factor', 0):.2f}\n"
+            if instruction_analysis.get("has_bulk_ferment"):
+                report += "  ✓ Has bulk fermentation\n"
+            if instruction_analysis.get("has_cold_ferment"):
+                report += "  ✓ Has cold fermentation (slow fermentation = finer crumb)\n"
+            if instruction_analysis.get("has_stretch_fold"):
+                report += "  ✓ Uses stretch and fold (develops gluten)\n"
+        
+        report += "\n" + "=" * 70 + "\n"
+        return report
+    
+    def get_ml_training_report(self) -> Optional[str]:
+        """Get comprehensive ML training report"""
+        if not self.ml_trainer:
+            return None
+        
+        return self.ml_trainer.get_training_report()
+    
+    def get_feature_importance_report(self) -> Optional[str]:
+        """Get feature importance report from ML models"""
+        if not self.ml_trainer:
+            return None
+        
+        return self.ml_trainer.get_feature_importance_report()
     
     def _get_feature_contributions(self, normalized_features: np.ndarray, 
                                    feature_names: List[str]) -> Dict[str, float]:

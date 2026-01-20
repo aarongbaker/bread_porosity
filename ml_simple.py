@@ -3,13 +3,20 @@ Simple ML Module for Bread Quality Classification
 Allows training on user-labeled images to classify new bread as Good/Problem
 """
 
-import cv2
+try:
+    import cv2
+except ImportError:
+    cv2 = None
+
 import numpy as np
 from pathlib import Path
-from typing import Dict, List, Tuple, Any
+from typing import Dict, List, Tuple, Any, Optional
 import json
 from dataclasses import dataclass, asdict
 from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -45,9 +52,13 @@ class SimpleMLClassifier:
         Returns:
             Feature vector (11 features)
         """
+        if cv2 is None:
+            logger.warning("cv2 (OpenCV) not available")
+            return []
+            
         image = cv2.imread(image_path)
         if image is None:
-            return None
+            return []
         
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         h, w = gray.shape
@@ -151,14 +162,14 @@ class SimpleMLClassifier:
         """
         if len(self.training_data) < 2:
             print("Need at least 2 training images (1 good, 1 problem)")
-            return None
+            return {}
         
         good_features = np.array([img.features for img in self.training_data if img.label == "good"])
         problem_features = np.array([img.features for img in self.training_data if img.label == "problem"])
         
         if len(good_features) == 0 or len(problem_features) == 0:
             print("Need at least one 'good' and one 'problem' image")
-            return None
+            return {}
         
         # Calculate class statistics
         good_mean = np.mean(good_features, axis=0)
@@ -244,10 +255,10 @@ class SimpleMLClassifier:
     
     def batch_predict(self, image_dir: str) -> Dict[str, Any]:
         """Predict on batch of images"""
-        image_dir = Path(image_dir)
+        image_dir_path = Path(image_dir)
         results = []
         
-        for image_file in sorted(image_dir.glob('*.jpg')) + sorted(image_dir.glob('*.png')):
+        for image_file in sorted(image_dir_path.glob('*.jpg')) + sorted(image_dir_path.glob('*.png')):
             result = self.predict(str(image_file))
             if 'error' not in result:
                 results.append(result)

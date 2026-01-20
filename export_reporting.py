@@ -11,6 +11,11 @@ from typing import Dict, List, Any, Optional
 import logging
 
 try:
+    from .shared_utils import calculate_std_dev
+except (ImportError, ValueError):
+    from shared_utils import calculate_std_dev
+
+try:
     from reportlab.lib.pagesizes import letter, A4
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.units import inch
@@ -176,7 +181,7 @@ class ExportEngine:
                 ['Mean Porosity %', f"{sum(porosities)/len(porosities):.2f}" if porosities else 0],
                 ['Min Porosity %', f"{min(porosities):.2f}" if porosities else 0],
                 ['Max Porosity %', f"{max(porosities):.2f}" if porosities else 0],
-                ['Std Dev Porosity %', f"{self._std_dev(porosities):.2f}" if porosities else 0],
+                ['Std Dev Porosity %', f"{calculate_std_dev(porosities):.2f}" if porosities else 0],
             ]
             
             for row in summary_data:
@@ -371,10 +376,4 @@ class ExportEngine:
             logger.error(f"Error creating charts: {e}")
             return {}
     
-    def _std_dev(self, values: List[float]) -> float:
-        """Calculate standard deviation."""
-        if not values or len(values) < 2:
-            return 0.0
-        mean = sum(values) / len(values)
-        variance = sum((x - mean) ** 2 for x in values) / (len(values) - 1)
-        return variance ** 0.5
+

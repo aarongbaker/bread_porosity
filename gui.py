@@ -300,22 +300,22 @@ class BreadPorositytoolGUI:
         status_bg.pack(fill=tk.X)
         
         status_frame = tk.Frame(status_bg, bg=self.bg_secondary)
-        status_frame.pack(fill=tk.X, padx=12, pady=12)
+        status_frame.pack(fill=tk.X, padx=12, pady=(8, 8))
         
         status_header = tk.Label(status_frame, text="  Status", 
-                                font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
-        status_header.pack(anchor=tk.W, pady=(0, 10))
+                                font=("Segoe UI", 10, "bold"), fg=self.text_primary, bg=self.bg_secondary)
+        status_header.pack(anchor=tk.W, pady=(0, 4))
         
         self.status_var = tk.StringVar(value="Ready")
         self.status_label = tk.Label(status_frame, textvariable=self.status_var, 
                                     foreground=self.success_color, 
                                     font=("Segoe UI", 9),
-                                    bg=self.bg_secondary, wraplength=290, justify=tk.LEFT)
+                                    bg=self.bg_secondary, wraplength=300, justify=tk.LEFT)
         self.status_label.pack(fill=tk.X)
         
         # Progress bar
         self.progress = ttk.Progressbar(status_frame, mode='indeterminate', length=280)
-        self.progress.pack(fill=tk.X, pady=(8, 0))
+        self.progress.pack(fill=tk.X, pady=(4, 0))
         
         # Right panel - Results with modern notebook
         right_panel = ttk.Frame(main_container)

@@ -300,6 +300,45 @@ Export tab → Select format → Click Export
 
 ---
 
+## Machine Learning - Porosity Prediction
+
+The system includes an **advanced ML system** for predicting bread porosity based on recipe parameters.
+
+**Start here:** [ML_COMPLETE_GUIDE.md](ML_COMPLETE_GUIDE.md) - Complete guide with examples
+
+**Key capabilities:**
+- Predict porosity from ingredients and baking instructions
+- Analyze impact of recipe changes
+- Train ensemble models from measured porosity data
+- 20+ automatically engineered features
+- Interactive prediction and sensitivity analysis
+
+**Quick example:**
+```python
+from recipe_predictor import RecipePredictor
+from recipe_database import RecipeDatabase
+
+db = RecipeDatabase("recipes_example.json")
+recipes = db.get_all_recipes()
+predictor = RecipePredictor(recipes, use_advanced_ml=True)
+
+recipe = {
+    "ingredients": {"bread flour": 500, "water": 350, "salt": 10},
+    "mixing_time_min": 10,
+    "proof_time_min": 480,
+    "oven_temp_c": 450,
+    "cooking_vessel": "dutch oven",
+    "cook_time_min": 40
+}
+
+predicted_porosity, details = predictor.predict_porosity(recipe)
+print(f"Predicted: {predicted_porosity:.1f}%")
+```
+
+See [ML_COMPLETE_GUIDE.md](ML_COMPLETE_GUIDE.md#quick-start) for 5-minute quick start, detailed examples, and architecture documentation.
+
+---
+
 ## Troubleshooting
 
 **GUI won't start**
