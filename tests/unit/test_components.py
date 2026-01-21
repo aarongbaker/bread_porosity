@@ -8,6 +8,7 @@ from gui.components.image_preview import ImagePreview
 from gui.components.results_display import ResultsDisplay
 
 
+@pytest.mark.gui
 class TestImagePreview:
     """Test cases for ImagePreview component"""
 
@@ -147,6 +148,7 @@ class TestImagePreview:
         assert info["size"] == (1024, 768)
 
 
+@pytest.mark.gui
 class TestResultsDisplay:
     """Test cases for ResultsDisplay component"""
 

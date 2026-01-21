@@ -10,8 +10,8 @@ Main modules:
 - analyze: Main analysis script and batch processing
 
 Quick start:
-    from analyze import analyze_bread_image
-    result = analyze_bread_image("bread.jpg", pixel_size_mm=0.1)
+    from services.analysis_service import AnalysisService
+    result = AnalysisService().analyze_image("bread.jpg", pixel_size_mm=0.1)
 """
 
 __version__ = "1.0"

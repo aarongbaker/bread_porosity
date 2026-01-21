@@ -14,9 +14,18 @@ matplotlib>=3.7.0
 reportlab>=4.0.0
 openpyxl>=3.1.0
 
+# GUI (Tkinter)
+tk  # For GUI (may require python3-tk or brew install python-tk on Mac/Linux)
+
 # Testing Framework
 pytest>=7.0.0
 pytest-cov>=4.0.0
 
-# Optional: For enhanced performance
-scikit-learn>=1.3.0  # For future ML enhancements
+# Linting & Formatting
+black>=24.1.1
+isort>=5.12.0
+flake8>=6.1.0
+
+# Optional ML features (for recipe prediction, defect detection)
+scikit-learn>=1.2.0  # Optional
+xgboost>=2.0.0       # Optional

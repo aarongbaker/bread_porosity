@@ -40,7 +40,96 @@ from utils.config_loader import ConfigLoader
 logger = get_logger(__name__)
 
 
+
 class BreadPorosityApp:
+    # --- Placeholder callbacks for all main buttons ---
+    def _on_log_recipe(self):
+        messagebox.showinfo("Log Recipe", "This will log your recipe. (Feature coming soon!)")
+
+    def _on_save_porosity(self):
+        messagebox.showinfo("Save Porosity", "This will save the measured porosity for your recipe. (Feature coming soon!)")
+
+    def _on_predict(self):
+        messagebox.showinfo("Predict", "This will predict porosity from your recipe. (Feature coming soon!)")
+
+    def _on_create_variant(self):
+        messagebox.showinfo("Create Variant", "This will create a new recipe variant. (Feature coming soon!)")
+
+    def _on_clone_recipe(self):
+        messagebox.showinfo("Clone Recipe", "This will clone the selected recipe. (Feature coming soon!)")
+
+    def _on_scale_recipe(self):
+        messagebox.showinfo("Scale Recipe", "This will scale your recipe. (Feature coming soon!)")
+
+    def _on_family_tree(self):
+        messagebox.showinfo("Family Tree", "This will show the recipe family tree. (Feature coming soon!)")
+
+    def _on_delete_recipe(self):
+        messagebox.showinfo("Delete Recipe", "This will delete the selected recipe. (Feature coming soon!)")
+
+    def _on_refresh_statistics(self):
+        messagebox.showinfo("Refresh Statistics", "This will refresh the statistics. (Feature coming soon!)")
+
+    def _on_compare_recipes(self):
+        messagebox.showinfo("Compare Recipes", "This will compare selected recipes. (Feature coming soon!)")
+
+    def _on_what_if_analysis(self):
+        messagebox.showinfo("What-If Analysis", "This will run a what-if analysis. (Feature coming soon!)")
+
+    def _on_export_csv(self):
+        messagebox.showinfo("Export to CSV", "This will export results to CSV. (Feature coming soon!)")
+
+    def _on_export_excel(self):
+        messagebox.showinfo("Export to Excel", "This will export results to Excel. (Feature coming soon!)")
+
+    def _on_generate_pdf(self):
+        messagebox.showinfo("Generate PDF Report", "This will generate a PDF report. (Feature coming soon!)")
+
+    def _on_create_charts(self):
+        messagebox.showinfo("Create Summary Charts", "This will create summary charts. (Feature coming soon!)")
+
+    def _on_evaluate_analysis(self):
+        messagebox.showinfo("Evaluate Analysis", "This will evaluate the current analysis. (Feature coming soon!)")
+
+    def _on_check_batch_consistency(self):
+        messagebox.showinfo("Check Batch Consistency", "This will check batch consistency. (Feature coming soon!)")
+
+    def _on_spc_statistics(self):
+        messagebox.showinfo("SPC Statistics", "This will show SPC statistics. (Feature coming soon!)")
+
+    def _on_view_alerts(self):
+        messagebox.showinfo("View Alerts", "This will show quality control alerts. (Feature coming soon!)")
+
+    def _on_configure_thresholds(self):
+        messagebox.showinfo("Configure Thresholds", "This will let you configure QC thresholds. (Feature coming soon!)")
+
+    def _on_analyze_defect(self):
+        messagebox.showinfo("Analyze Defect", "This will analyze the current image for defects. (Feature coming soon!)")
+
+    def _on_batch_defect(self):
+        messagebox.showinfo("Batch Defect Analysis", "This will run defect analysis on a batch. (Feature coming soon!)")
+
+    def _on_add_good_image(self):
+        messagebox.showinfo("Add Good Image", "This will add a good bread image for ML training. (Feature coming soon!)")
+
+    def _on_add_problem_image(self):
+        messagebox.showinfo("Add Problem Image", "This will add a problem bread image for ML training. (Feature coming soon!)")
+
+    def _on_train_model(self):
+        messagebox.showinfo("Train Model", "This will train the ML model. (Feature coming soon!)")
+
+    def _on_predict_current(self):
+        messagebox.showinfo("Predict Current", "This will predict the quality of the current bread image. (Feature coming soon!)")
+
+    def _on_add_photos(self):
+        messagebox.showinfo("Add Photos", "This will let you add bread photos from your computer. (Feature coming soon!)")
+
+    def _on_reload_list(self):
+        messagebox.showinfo("Reload List", "This will reload the list of bread photos. (Feature coming soon!)")
+
+    def _on_clear_photo_selection(self):
+        self.image_listbox.selection_clear(0, tk.END)
+        self.status_var.set("Photo selection cleared.")
     """Main application class with legacy layout and refactored code"""
 
     def __init__(self, root: tk.Tk):
@@ -204,7 +293,7 @@ class BreadPorosityApp:
 
         img_header = tk.Label(
             img_section,
-            text="📁  Image Library",
+            text="🍞  Your Bread Photos",
             font=("Segoe UI", 11, "bold"),
             fg=self.colors.text_primary,
             bg=self.colors.bg_secondary
@@ -239,10 +328,10 @@ class BreadPorosityApp:
         button_row = ttk.Frame(img_section)
         button_row.pack(fill=tk.X, pady=(8, 0))
 
-        ttk.Button(button_row, text="📂 Open Folder").pack(
+        ttk.Button(button_row, text="📂 Add Photos", command=self._on_add_photos).pack(
             side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 6)
         )
-        ttk.Button(button_row, text="🔄 Refresh").pack(
+        ttk.Button(button_row, text="🔄 Reload List", command=self._on_reload_list).pack(
             side=tk.LEFT, fill=tk.X, expand=True
         )
 
@@ -256,7 +345,7 @@ class BreadPorosityApp:
 
         params_header = tk.Label(
             params_frame,
-            text="  Analysis Parameters",
+            text="  Settings for This Bread",
             font=("Segoe UI", 11, "bold"),
             fg=self.colors.text_primary,
             bg=self.colors.bg_secondary
@@ -326,7 +415,7 @@ class BreadPorosityApp:
 
         mode_header = tk.Label(
             mode_frame,
-            text="  Analysis Mode",
+            text="  What Are You Analyzing?",
             font=("Segoe UI", 11, "bold"),
             fg=self.colors.text_primary,
             bg=self.colors.bg_secondary
@@ -336,13 +425,13 @@ class BreadPorosityApp:
         self.mode_var = tk.StringVar(value="single")
         ttk.Radiobutton(
             mode_frame,
-            text="Single Image",
+            text="One Bread Slice",
             variable=self.mode_var,
             value="single"
         ).pack(anchor=tk.W, pady=4)
         ttk.Radiobutton(
             mode_frame,
-            text="Loaf (Multiple Slices)",
+            text="Whole Loaf (Many Slices)",
             variable=self.mode_var,
             value="loaf"
         ).pack(anchor=tk.W, pady=4)
@@ -368,7 +457,7 @@ class BreadPorosityApp:
 
         self.analyze_btn = tk.Button(
             action_frame,
-            text="▶  Analyze",
+            text="▶  Analyze Bread",
             command=self._on_analyze,
             bg=self.colors.bg_accent,
             fg="white",
@@ -384,7 +473,7 @@ class BreadPorosityApp:
         )
         self.analyze_btn.pack(fill=tk.X, pady=(0, 10))
 
-        ttk.Button(action_frame, text="✕ Clear Selection").pack(fill=tk.X)
+        ttk.Button(action_frame, text="✕ Clear Photo Selection", command=self._on_clear_photo_selection).pack(fill=tk.X)
 
     def _create_status_section(self, parent):
         """Create status section"""
@@ -583,14 +672,14 @@ class BreadPorosityApp:
         recipe_btn_frame = tk.Frame(right_recipe, bg=self.colors.bg_secondary)
         recipe_btn_frame.pack(fill=tk.X)
 
-        ttk.Button(recipe_btn_frame, text=" Log Recipe").pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(recipe_btn_frame, text=" Save Porosity").pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(recipe_btn_frame, text=" Predict").pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(recipe_btn_frame, text=" Create Variant").pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(recipe_btn_frame, text=" Clone Recipe").pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(recipe_btn_frame, text="📐 Scale Recipe").pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(recipe_btn_frame, text=" Family Tree").pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(recipe_btn_frame, text="  Delete").pack(fill=tk.X)
+        ttk.Button(recipe_btn_frame, text=" Log Recipe", command=self._on_log_recipe).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(recipe_btn_frame, text=" Save Porosity", command=self._on_save_porosity).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(recipe_btn_frame, text=" Predict", command=self._on_predict).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(recipe_btn_frame, text=" Create Variant", command=self._on_create_variant).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(recipe_btn_frame, text=" Clone Recipe", command=self._on_clone_recipe).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(recipe_btn_frame, text="📐 Scale Recipe", command=self._on_scale_recipe).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(recipe_btn_frame, text=" Family Tree", command=self._on_family_tree).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(recipe_btn_frame, text="  Delete", command=self._on_delete_recipe).pack(fill=tk.X)
 
         ttk.Label(right_recipe, text="Prediction Results:").pack(anchor=tk.W, pady=(10, 0))
 
@@ -633,7 +722,7 @@ class BreadPorosityApp:
 
         stats_btn_frame = ttk.Frame(stats_tab)
         stats_btn_frame.pack(fill=tk.X, padx=12, pady=(0, 12))
-        ttk.Button(stats_btn_frame, text="🔄 Refresh Statistics").pack(side=tk.LEFT)
+        ttk.Button(stats_btn_frame, text="🔄 Refresh Statistics", command=self._on_refresh_statistics).pack(side=tk.LEFT)
 
         # Consistency tab
         consist_tab = ttk.Frame(self.notebook)
@@ -675,8 +764,8 @@ class BreadPorosityApp:
 
         compare_btn_frame = ttk.Frame(compare_tab)
         compare_btn_frame.pack(fill=tk.X, padx=12, pady=(0, 12))
-        ttk.Button(compare_btn_frame, text=" Compare Recipes").pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(compare_btn_frame, text=" What-If Analysis").pack(side=tk.LEFT)
+        ttk.Button(compare_btn_frame, text=" Compare Recipes", command=self._on_compare_recipes).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(compare_btn_frame, text=" What-If Analysis", command=self._on_what_if_analysis).pack(side=tk.LEFT)
 
         # Export tab
         export_tab = ttk.Frame(self.notebook)
@@ -699,10 +788,10 @@ class BreadPorosityApp:
         )
         export_header.pack(anchor=tk.W, pady=(0, 10))
 
-        ttk.Button(export_options_frame, text=" Export to CSV").pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(export_options_frame, text=" Export to Excel").pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(export_options_frame, text="📄 Generate PDF Report").pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(export_options_frame, text="📉 Create Summary Charts").pack(fill=tk.X)
+        ttk.Button(export_options_frame, text=" Export to CSV", command=self._on_export_csv).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(export_options_frame, text=" Export to Excel", command=self._on_export_excel).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(export_options_frame, text="📄 Generate PDF Report", command=self._on_generate_pdf).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(export_options_frame, text="📉 Create Summary Charts", command=self._on_create_charts).pack(fill=tk.X)
 
         export_scroll = ttk.Scrollbar(export_container)
         export_scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -739,11 +828,11 @@ class BreadPorosityApp:
         )
         qc_header.pack(anchor=tk.W, pady=(0, 10))
 
-        ttk.Button(qc_controls_frame, text=" Evaluate Current Analysis").pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(qc_controls_frame, text="📦 Check Batch Consistency").pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(qc_controls_frame, text=" SPC Statistics").pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(qc_controls_frame, text="⚠  View Alerts").pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(qc_controls_frame, text="  Configure Thresholds").pack(fill=tk.X)
+        ttk.Button(qc_controls_frame, text=" Evaluate Current Analysis", command=self._on_evaluate_analysis).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(qc_controls_frame, text="📦 Check Batch Consistency", command=self._on_check_batch_consistency).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(qc_controls_frame, text=" SPC Statistics", command=self._on_spc_statistics).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(qc_controls_frame, text="⚠  View Alerts", command=self._on_view_alerts).pack(fill=tk.X, pady=(0, 6))
+        ttk.Button(qc_controls_frame, text="  Configure Thresholds", command=self._on_configure_thresholds).pack(fill=tk.X)
 
         qc_scroll = ttk.Scrollbar(qc_container)
         qc_scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -780,8 +869,8 @@ class BreadPorosityApp:
         defect_controls = tk.Frame(defect_container, bg=self.colors.bg_secondary)
         defect_controls.pack(fill=tk.X, pady=(0, 10))
 
-        ttk.Button(defect_controls, text="Analyze Current Image").pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(defect_controls, text="Batch Analysis").pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(defect_controls, text="Analyze Current Image", command=self._on_analyze_defect).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(defect_controls, text="Batch Analysis", command=self._on_batch_defect).pack(side=tk.LEFT, padx=(0, 5))
 
         defect_scroll = ttk.Scrollbar(defect_container)
         defect_scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -818,10 +907,10 @@ class BreadPorosityApp:
         ml_buttons = tk.Frame(ml_container, bg=self.colors.bg_secondary)
         ml_buttons.pack(fill=tk.X, pady=(0, 10))
 
-        ttk.Button(ml_buttons, text="Add Good Image").pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(ml_buttons, text="Add Problem Image").pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(ml_buttons, text="Train Model").pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(ml_buttons, text="Predict Current").pack(side=tk.LEFT)
+        ttk.Button(ml_buttons, text="Add Good Image", command=self._on_add_good_image).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(ml_buttons, text="Add Problem Image", command=self._on_add_problem_image).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(ml_buttons, text="Train Model", command=self._on_train_model).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(ml_buttons, text="Predict Current", command=self._on_predict_current).pack(side=tk.LEFT)
 
         ml_scroll = ttk.Scrollbar(ml_container)
         ml_scroll.pack(side=tk.RIGHT, fill=tk.Y)

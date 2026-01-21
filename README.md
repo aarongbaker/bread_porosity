@@ -1,5 +1,45 @@
 # Bread Porosity Analysis Tool
 
+## 🚀 Quick Start
+
+1. **Install Python 3.9+**
+2. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Create required folders:**
+   ```bash
+   mkdir -p unprocessed processed output results
+   ```
+4. **Run the GUI:**
+   ```bash
+   python gui/main.py
+   ```
+5. **Run a test analysis:**
+   ```bash
+   python analyze.py sample.jpg --pixel-size 0.1
+   ```
+6. **Run tests:**
+   ```bash
+   pytest
+   ```
+
+See [QUICKSTART.md](QUICKSTART.md) and [FIRST_RUN_CHECKLIST.md](FIRST_RUN_CHECKLIST.md) for more.
+
+---
+
+## Troubleshooting
+
+- **Tkinter errors (GUI won't start):**
+  - macOS: `brew install python-tk`
+  - Ubuntu: `sudo apt-get install python3-tk`
+- **Missing folders:**
+  - Create with `mkdir -p unprocessed processed output results`
+- **ML features not working:**
+  - Install optional dependencies: `pip install scikit-learn xgboost`
+
+---
+
 **Professional image processing software for measuring bread porosity, crumb structure, and quality metrics with machine learning predictions and real-time quality control.**
 
 ![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
@@ -62,12 +102,12 @@
 pip install -r requirements.txt
 
 # Run GUI
-python gui.py
+python gui/main.py
 ```
 
 ### First Analysis
 
-1. **Open GUI**: `python gui.py`
+1. **Open GUI**: `python gui/main.py`
 2. **Load Image**: Click "Open Folder"
 3. **Select Image**: Choose bread slice
 4. **Analyze**: Click "▶ Analyze"
@@ -86,18 +126,18 @@ python gui.py
 
 ```
 bread_porosity/
-├── gui.py                 # Main GUI (2100+ lines)
-├── analyze.py            # Analysis engine
+├── gui/main.py           # GUI entry point
+├── analyze.py            # CLI analysis entry point
+├── services/             # Application services
 ├── quality_control.py    # QC with profiles
-├── export_reporting.py   # Export functionality
-├── recipe_*.py           # Recipe system
 ├── imaging_pipeline.py   # Image processing
+├── metrics.py            # Metrics computation
+├── visualization.py      # Output generation
 ├── unprocessed/          # Input images
 ├── processed/            # Output images
 ├── results/              # Analysis results
-├── config.json           # Configuration
-├── qc_config.json        # QC profiles
-└── recipes.json          # Recipe database
+├── output/               # Visual outputs
+└── config_template.json  # Configuration template
 ```
 
 ---
@@ -177,12 +217,7 @@ bread_porosity/
 
 ## Documentation
 
-- **[Quick Start](QUICK_START.md)** - 5-minute guide
-- **[Features](FEATURES.md)** - Complete feature reference
-- **[Installation](INSTALLATION.md)** - Detailed setup
-- **[Bread Type Profiles](BREAD_TYPE_PROFILES.md)** - Profile system
-- **[ML & Defects](ML_AND_DEFECTS.md)** - AI features guide
-- **[GitHub Safe](GITHUB_SAFE.md)** - Production version
+- **Project Overview**: `PROJECT_OVERVIEW.py`
 
 ---
 
@@ -304,7 +339,7 @@ Export tab → Select format → Click Export
 
 The system includes an **advanced ML system** for predicting bread porosity based on recipe parameters.
 
-**Start here:** [ML_COMPLETE_GUIDE.md](ML_COMPLETE_GUIDE.md) - Complete guide with examples
+**Start here:** Explore `ml_models/` and `recipes_example.json` for examples
 
 **Key capabilities:**
 - Predict porosity from ingredients and baking instructions
@@ -335,7 +370,7 @@ predicted_porosity, details = predictor.predict_porosity(recipe)
 print(f"Predicted: {predicted_porosity:.1f}%")
 ```
 
-See [ML_COMPLETE_GUIDE.md](ML_COMPLETE_GUIDE.md#quick-start) for 5-minute quick start, detailed examples, and architecture documentation.
+See `ml_models/` for implementation details and available predictors.
 
 ---
 
@@ -369,8 +404,11 @@ MIT License - See LICENSE file
 ## 🎯 Start Now
 
 ```bash
-python gui.py
+python gui/main.py
 ```
 
 **Ready to analyze bread! **
+
+---
+
 

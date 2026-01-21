@@ -1,0 +1,120 @@
+{
+  "pixel_size_mm": 0.1,
+  "threshold_method": "otsu",
+  "normalization_method": "clahe",
+  "min_hole_diameter_mm": 1.0,
+  "max_hole_diameter_mm": 30.0,
+  "current_bread_type": "ciabatta",
+  "bread_types": {
+    "sourdough": {
+      "display_name": "Sourdough",
+      "porosity_target_min": 20.0,
+      "porosity_target_max": 35.0,
+      "porosity_warning_min": 18.0,
+      "porosity_warning_max": 37.0,
+      "hole_count_target_min": 100,
+      "hole_count_target_max": 400,
+      "hole_diameter_target_min": 2.0,
+      "hole_diameter_target_max": 8.0,
+      "uniformity_acceptable_min": 0.7,
+      "consistency_cv_max": 0.15,
+      "quality_grades": {
+        "excellent": {
+          "porosity": [
+            25,
+            32
+          ],
+          "uniformity": [
+            0.85,
+            1.0
+          ]
+        },
+        "good": {
+          "porosity": [
+            22,
+            35
+          ],
+          "uniformity": [
+            0.75,
+            0.95
+          ]
+        },
+        "fair": {
+          "porosity": [
+            18,
+            38
+          ],
+          "uniformity": [
+            0.65,
+            0.85
+          ]
+        },
+        "poor": {
+          "porosity": [
+            0,
+            100
+          ],
+          "uniformity": [
+            0.0,
+            1.0
+          ]
+        }
+      }
+    },
+    "ciabatta": {
+      "display_name": "Ciabatta",
+      "porosity_target_min": 30.0,
+      "porosity_target_max": 45.0,
+      "porosity_warning_min": 28.0,
+      "porosity_warning_max": 47.0,
+      "hole_count_target_min": 200,
+      "hole_count_target_max": 600,
+      "hole_diameter_target_min": 3.0,
+      "hole_diameter_target_max": 12.0,
+      "uniformity_acceptable_min": 0.6,
+      "consistency_cv_max": 0.18,
+      "quality_grades": {
+        "excellent": {
+          "porosity": [
+            35,
+            42
+          ],
+          "uniformity": [
+            0.8,
+            1.0
+          ]
+        },
+        "good": {
+          "porosity": [
+            32,
+            45
+          ],
+          "uniformity": [
+            0.7,
+            0.95
+          ]
+        },
+        "fair": {
+          "porosity": [
+            28,
+            47
+          ],
+          "uniformity": [
+            0.6,
+            0.9
+          ]
+        },
+        "poor": {
+          "porosity": [
+            0,
+            100
+          ],
+          "uniformity": [
+            0.0,
+            1.0
+          ]
+        }
+      }
+    }
+  }
+}

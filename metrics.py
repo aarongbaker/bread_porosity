@@ -96,26 +96,38 @@ class PorometryMetrics:
     
     def _compute_hole_metrics(self, binary_holes: np.ndarray, roi_mask: np.ndarray) -> Dict[str, Any]:
         """Compute hole size distribution, count, mean size, etc."""
-        # Label connected components
+        # Label connected components (non-zero pixels are holes)
         labeled_holes, num_holes = ndimage.label(binary_holes)
         
         if num_holes == 0:
             return {
                 "num_holes": 0,
+                "hole_count_total": 0,
                 "mean_hole_area_pixels": 0,
                 "mean_hole_area_mm2": 0,
                 "mean_hole_diameter_mm": 0,
+                "hole_diameter_mean_mm": 0,
+                "hole_diameter_std_mm": 0,
+                "hole_diameter_min_mm": 0,
+                "hole_diameter_max_mm": 0,
                 "largest_hole_area_pixels": 0,
                 "largest_hole_diameter_mm": 0,
                 "smallest_hole_area_pixels": 0,
+                "smallest_hole_diameter_mm": 0,
                 "holes_per_cm2": 0,
                 "hole_area_distribution": [],
-                "hole_area_std": 0,
+                "hole_area_std_pixels": 0,
+                "hole_area_std_mm2": 0,
+                "hole_size_distribution_data": {
+                    "hole_area_pixels": [],
+                    "hole_diameter_mm": [],
+                },
             }
         
-        # Get size of each hole
-        hole_areas = ndimage.sum(binary_holes, labeled_holes, range(num_holes + 1))[1:]
-        hole_areas = hole_areas[hole_areas > 0]  # Remove zero areas
+        # Get size of each hole (count pixels, not summed intensity)
+        hole_areas = ndimage.sum(binary_holes > 0, labeled_holes, range(1, num_holes + 1))
+        hole_areas = np.asarray(hole_areas, dtype=float)
+        hole_areas = hole_areas[hole_areas > 0]
         
         roi_area_mm2 = cv2.countNonZero(roi_mask) * (self.pixel_size_mm ** 2)
         
@@ -125,21 +137,35 @@ class PorometryMetrics:
         # Convert to diameter (assuming circular holes: A = π*r² → d = 2*sqrt(A/π))
         hole_diameters_mm = 2 * np.sqrt(hole_areas_mm2 / np.pi)
         
+        mean_diameter_mm = float(np.mean(hole_diameters_mm))
+        std_diameter_mm = float(np.std(hole_diameters_mm))
+        min_diameter_mm = float(np.min(hole_diameters_mm))
+        max_diameter_mm = float(np.max(hole_diameters_mm))
+
         metrics = {
             "num_holes": int(num_holes),
+            "hole_count_total": int(num_holes),
             "mean_hole_area_pixels": float(np.mean(hole_areas)),
             "mean_hole_area_mm2": float(np.mean(hole_areas_mm2)),
-            "mean_hole_diameter_mm": float(np.mean(hole_diameters_mm)),
+            "mean_hole_diameter_mm": mean_diameter_mm,
+            "hole_diameter_mean_mm": mean_diameter_mm,
+            "hole_diameter_std_mm": std_diameter_mm,
+            "hole_diameter_min_mm": min_diameter_mm,
+            "hole_diameter_max_mm": max_diameter_mm,
             "largest_hole_area_pixels": float(np.max(hole_areas)),
             "largest_hole_area_mm2": float(np.max(hole_areas_mm2)),
-            "largest_hole_diameter_mm": float(np.max(hole_diameters_mm)),
+            "largest_hole_diameter_mm": max_diameter_mm,
             "smallest_hole_area_pixels": float(np.min(hole_areas)),
-            "smallest_hole_diameter_mm": float(np.min(hole_diameters_mm)),
+            "smallest_hole_diameter_mm": min_diameter_mm,
             "hole_area_std_pixels": float(np.std(hole_areas)),
             "hole_area_std_mm2": float(np.std(hole_areas_mm2)),
             "holes_per_cm2": float(num_holes / (roi_area_mm2 / 100)),
-            "hole_area_distribution": hole_areas.tolist(),  # For histogram
+            "hole_area_distribution": hole_areas.tolist(),
             "hole_area_cv": float(np.std(hole_areas) / np.mean(hole_areas)) if np.mean(hole_areas) > 0 else 0,
+            "hole_size_distribution_data": {
+                "hole_area_pixels": hole_areas.tolist(),
+                "hole_diameter_mm": hole_diameters_mm.tolist(),
+            },
         }
         
         if self.verbose:
@@ -202,10 +228,14 @@ class PorometryMetrics:
         hist = hist / np.sum(hist)
         orientation_entropy = -np.sum(hist * np.log2(hist + 1e-10))
         
+        mean_aspect_ratio = float(np.mean(aspect_ratios))
+        mean_orientation_deg = float(np.mean(orientations))
         metrics = {
-            "mean_aspect_ratio": float(np.mean(aspect_ratios)),
+            "mean_aspect_ratio": mean_aspect_ratio,
+            "anisotropy_ratio": mean_aspect_ratio,
             "aspect_ratio_std": float(np.std(aspect_ratios)),
-            "mean_orientation_deg": float(np.mean(orientations)),
+            "mean_orientation_deg": mean_orientation_deg,
+            "orientation_mean_deg": mean_orientation_deg,
             "orientation_entropy": float(orientation_entropy),  # 0=aligned, 4.17=random
         }
         
@@ -230,6 +260,7 @@ class PorometryMetrics:
                 "crumb_brightness_std": 0,
                 "crumb_brightness_cv": 0,
                 "crumb_brightness_skewness": 0,
+                "uniformity_score": 0,
             }
         
         mean_brightness = float(np.mean(roi_pixels))
@@ -237,11 +268,13 @@ class PorometryMetrics:
         cv_brightness = std_brightness / (mean_brightness + 1e-6)
         skewness_brightness = float(skew(roi_pixels))
         
+        uniformity_score = max(0.0, min(1.0, 1.0 - cv_brightness))
         metrics = {
             "crumb_brightness_mean": mean_brightness,
             "crumb_brightness_std": std_brightness,
             "crumb_brightness_cv": cv_brightness,  # Coefficient of variation (0=uniform)
             "crumb_brightness_skewness": skewness_brightness,
+            "uniformity_score": uniformity_score,
         }
         
         if self.verbose:
@@ -267,7 +300,7 @@ def format_metrics_report(metrics: Dict[str, Any]) -> str:
     report.append(f"  Mean hole diameter: {metrics.get('mean_hole_diameter_mm', 0):.2f} mm")
     report.append(f"  Largest hole diameter: {metrics.get('largest_hole_diameter_mm', 0):.2f} mm")
     report.append(f"  Smallest hole diameter: {metrics.get('smallest_hole_diameter_mm', 0):.2f} mm")
-    report.append(f"  Hole diameter std: {metrics.get('hole_area_std_mm2', 0):.2f} mm²")
+    report.append(f"  Hole diameter std: {metrics.get('hole_diameter_std_mm', 0):.2f} mm")
     report.append(f"  Coefficient of variation (size): {metrics.get('hole_area_cv', 0):.3f}")
     report.append(f"  Holes per cm²: {metrics.get('holes_per_cm2', 0):.1f}")
     

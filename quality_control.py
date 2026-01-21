@@ -21,7 +21,10 @@ class QualityControlManager:
     def __init__(self, config_file: str = "qc_config.json"):
         self.config_file = Path(config_file)
         self.config = self._load_config()
-        self.current_bread_type = "sourdough"  # Default bread type
+        self.current_bread_type = self.config.get("current_bread_type", "sourdough")
+        if self.current_bread_type not in self.config.get("bread_types", {}):
+            self.current_bread_type = "sourdough"
+            self.config["current_bread_type"] = self.current_bread_type
         self.alerts = deque(maxlen=100)  # Keep last 100 alerts
         self.history = deque(maxlen=500)  # Keep last 500 measurements
     
@@ -248,13 +251,17 @@ class QualityControlManager:
         
         profile = self.config['bread_types'][bread_type]
         
+        base_param = parameter
+        if parameter.endswith("_min") or parameter.endswith("_max"):
+            base_param = parameter.rsplit("_", 1)[0]
+
         if min_val is not None:
-            profile[f"{parameter}_min"] = min_val
+            profile[f"{base_param}_min"] = min_val
         if max_val is not None:
-            profile[f"{parameter}_max"] = max_val
+            profile[f"{base_param}_max"] = max_val
         
         self.save_config()
-        logger.info(f"Updated {bread_type} threshold {parameter}: min={min_val}, max={max_val}")
+        logger.info(f"Updated {bread_type} threshold {base_param}: min={min_val}, max={max_val}")
     
     def evaluate_analysis(self, metrics: Dict[str, Any], 
                          recipe_id: Optional[int] = None, 
@@ -468,7 +475,9 @@ class QualityControlManager:
             uniformity_min = min(uniformities)
             uniformity_max = max(uniformities)
             
-            consistency_limit = self.config['consistency_cv_max'] * 100  # Convert to percent
+            profile = self.get_current_profile()
+            consistency_cv_max = profile.get("consistency_cv_max", self.config.get("consistency_cv_max", 0.15))
+            consistency_limit = consistency_cv_max * 100  # Convert to percent
             is_consistent = porosity_cv <= consistency_limit
             
             report = {

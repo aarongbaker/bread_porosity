@@ -16,22 +16,19 @@ Measures: Porosity %, hole size, hole count, hole shape, directionality, uniform
 FILE MANIFEST
 =============
 
-Core Implementation (5 files, ~2000 lines of code)
+Core Implementation
   imaging_pipeline.py    - Image processing (grayscale, normalize, threshold, etc)
   metrics.py             - Compute porosity and structure metrics
   visualization.py       - Generate plots, images, JSON output
   calibration.py         - Reference patches, setup validation
-  analyze.py             - Main script, batch processing
+  analyze.py             - CLI analysis entry point
+  gui/main.py            - GUI entry point
 
-Documentation (5 files, ~5000 lines)
-  START_HERE.md           ⭐ Read this first! Project overview
-  QUICKSTART.md           - 30-second start guide
+Documentation
   README.md               - Full technical documentation
-  INSTALLATION.md         - Setup and verification
-  IMPLEMENTATION_SUMMARY.md - Architecture and design
+  PROJECT_OVERVIEW.py     - Project overview (this file)
 
-Resources (3 files)
-  examples.py             - Interactive example workflows
+Resources
   config_template.json    - Configuration template
   requirements.txt        - Python dependencies
   __init__.py             - Package initialization
@@ -44,6 +41,9 @@ QUICK START (Copy & Paste)
 
 2. Analyze a bread image:
    python analyze.py your_bread.jpg --pixel-size 0.1
+
+3. Launch the GUI:
+   python gui/main.py
 
 3. Check results:
    - output/comparison.png (processing steps)
@@ -79,7 +79,7 @@ SETUP REQUIREMENTS
 ✓ Good lighting uniformity (score >70)
 ✓ Sharp focus (Laplacian variance >500)
 
-Run 'python analyze.py --setup' to see full checklist.
+Use calibration helpers in calibration.py for setup checks.
 
 USAGE EXAMPLES
 ==============
@@ -91,31 +91,19 @@ Batch processing:
   python analyze.py --batch bread_samples/ --output results/
 
 In Python code:
-  from analyze import analyze_bread_image
-  result = analyze_bread_image("bread.jpg", pixel_size_mm=0.1)
-  print(result['metrics']['porosity_percent'])
-
-Interactive examples:
-  python examples.py
+  from services.analysis_service import AnalysisService
+  result = AnalysisService().analyze_image("bread.jpg", pixel_size_mm=0.1)
+  print(result.porosity_percent)
 
 DOCUMENTATION MAP
 =================
 
-START_HERE.md (you are here!)
+PROJECT_OVERVIEW.py (you are here!)
   ↓ Quick overview and orientation
-  
-QUICKSTART.md
-  ↓ 30-second start guide, 3-step usage
-  
+
 README.md
   ↓ Full technical docs, all features, troubleshooting
-  
-INSTALLATION.md
-  ↓ Setup verification, tests
-  
-examples.py
-  ↓ Interactive examples to try
-  
+
 Code docstrings
   ↓ Detailed API documentation
 
@@ -231,15 +219,11 @@ bread_porosity/
 ├── metrics.py                       (Metrics computation)
 ├── visualization.py                 (Output generation)
 ├── calibration.py                   (Setup & validation)
-├── analyze.py                       (Main script)
-├── examples.py                      (Example workflows)
+├── analyze.py                       (CLI entry point)
+├── gui/main.py                      (GUI entry point)
 ├── requirements.txt                 (Dependencies)
 ├── config_template.json             (Config template)
-├── START_HERE.md                    ⭐ Overview (this file)
-├── QUICKSTART.md                    (Quick start)
 ├── README.md                        (Full docs)
-├── INSTALLATION.md                  (Setup)
-├── IMPLEMENTATION_SUMMARY.md        (Architecture)
 └── output/                          (Results folder)
 
 DEPENDENCIES
