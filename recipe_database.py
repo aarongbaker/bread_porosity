@@ -45,7 +45,9 @@ class RecipeDatabase:
                    notes: str = "", room_temp_c: Optional[float] = None,
                    room_humidity_pct: Optional[float] = None, 
                    altitude_m: Optional[float] = None,
-                   parent_recipe_id: Optional[int] = None) -> Dict:
+                   parent_recipe_id: Optional[int] = None,
+                   steps: Optional[List[str]] = None,
+                   bread_type: str = "other") -> Dict:
         """
         Add a new recipe to the database
         
@@ -84,7 +86,9 @@ class RecipeDatabase:
             "altitude_m": altitude_m,
             "parent_recipe_id": parent_recipe_id,
             "version": 1,
-            "quality_score": None
+            "quality_score": None,
+            "steps": steps or [],
+            "bread_type": bread_type
         }
         
         self.recipes.append(recipe)

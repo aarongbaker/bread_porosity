@@ -134,7 +134,7 @@ class SimpleMLClassifier:
             return False
         
         features = self.extract_features(image_path)
-        if features is None:
+        if not features:
             print(f"Could not read image: {image_path}")
             return False
         

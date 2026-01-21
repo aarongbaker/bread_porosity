@@ -4,7 +4,7 @@ User-friendly interface for analyzing bread images, managing loaves, and logging
 """
 
 import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
+from tkinter import ttk, filedialog, messagebox, simpledialog
 from pathlib import Path
 import threading
 from PIL import Image, ImageTk
@@ -363,6 +363,8 @@ class BreadPorositytoolGUI:
                                     borderwidth=0, padx=12, pady=12)
         self.results_text.pack(fill=tk.BOTH, expand=True)
         results_scroll.config(command=self.results_text.yview)
+        self.results_text.insert(1.0, "Analyze an image to see results here...")
+        self.results_text.config(state=tk.DISABLED)  # Read-only until analysis
         
         # Metrics tab
         metrics_tab = ttk.Frame(self.notebook)
@@ -377,6 +379,8 @@ class BreadPorositytoolGUI:
                                    borderwidth=0, padx=12, pady=12)
         self.metrics_text.pack(fill=tk.BOTH, expand=True)
         metrics_scroll.config(command=self.metrics_text.yview)
+        self.metrics_text.insert(1.0, "Analyze an image to see metrics here...")
+        self.metrics_text.config(state=tk.DISABLED)
         
         # Recipe Management tab
         recipe_tab = ttk.Frame(self.notebook)
@@ -428,7 +432,20 @@ class BreadPorositytoolGUI:
   "room_temp_c": 22.5,
   "room_humidity_pct": 65,
   "altitude_m": 100,
-  "measured_porosity": null
+  "measured_porosity": null,
+  "steps": [
+    "Mix flour and water, autolyse for 30 minutes",
+    "Add starter and salt, mix until combined",
+    "Perform 4 sets of stretch and folds, 30 min apart",
+    "Bulk ferment at room temp until doubled",
+    "Pre-shape and rest 20 minutes",
+    "Final shape and place in banneton",
+    "Cold retard in fridge overnight",
+    "Preheat dutch oven at 450°F/230°C for 1 hour",
+    "Score dough and bake covered for 20 minutes",
+    "Remove lid and bake 20 more minutes",
+    "Cool on wire rack before slicing"
+  ]
 }"""
         self.recipe_input_text.insert(1.0, template)
         
@@ -512,6 +529,8 @@ class BreadPorositytoolGUI:
                                  insertbackground=self.bg_accent)
         self.stats_text.pack(fill=tk.BOTH, expand=True)
         stats_scroll.config(command=self.stats_text.yview)
+        self.stats_text.insert(1.0, "Click 'Refresh Statistics' to view statistics...")
+        self.stats_text.config(state=tk.DISABLED)
         
         # Button to refresh stats
         stats_btn_frame = ttk.Frame(stats_tab)
@@ -533,6 +552,8 @@ class BreadPorositytoolGUI:
                                    insertbackground=self.bg_accent)
         self.consist_text.pack(fill=tk.BOTH, expand=True)
         consist_scroll.config(command=self.consist_text.yview)
+        self.consist_text.insert(1.0, "Analyze a loaf to see consistency data here...")
+        self.consist_text.config(state=tk.DISABLED)
         
         # Comparison Tools tab
         compare_tab = ttk.Frame(self.notebook)
@@ -548,6 +569,8 @@ class BreadPorositytoolGUI:
                                    insertbackground=self.bg_accent)
         self.compare_text.pack(fill=tk.BOTH, expand=True)
         compare_scroll.config(command=self.compare_text.yview)
+        self.compare_text.insert(1.0, "Click 'Compare Recipes' or 'What-If Analysis' to see comparisons...")
+        self.compare_text.config(state=tk.DISABLED)
         
         # Buttons for comparison
         compare_btn_frame = ttk.Frame(compare_tab)
@@ -939,8 +962,14 @@ class BreadPorositytoolGUI:
             self.preview_label.config(text=f"Error loading image: {e}", bg=self.bg_secondary)
         
         self.set_status(f"Selected: {filename}", color=self.text_primary)
+        self.results_text.config(state=tk.NORMAL)
         self.results_text.delete(1.0, tk.END)
+        self.results_text.insert(1.0, "Analyze an image to see results here...")
+        self.results_text.config(state=tk.DISABLED)
+        self.metrics_text.config(state=tk.NORMAL)
         self.metrics_text.delete(1.0, tk.END)
+        self.metrics_text.insert(1.0, "Analyze an image to see metrics here...")
+        self.metrics_text.config(state=tk.DISABLED)
     
     def start_analysis(self):
         """Start image analysis in a separate thread"""
@@ -1062,13 +1091,17 @@ class BreadPorositytoolGUI:
         # NEW: Use result presenter for formatted output
         formatted_results = self.result_presenter.format_results(result)
         
+        self.results_text.config(state=tk.NORMAL)
         self.results_text.delete(1.0, tk.END)
         self.results_text.insert(1.0, formatted_results)
+        self.results_text.config(state=tk.DISABLED)
         
         # Display metrics JSON in metrics tab
         metrics_json = json.dumps(result.get('metrics', {}), indent=2)
+        self.metrics_text.config(state=tk.NORMAL)
         self.metrics_text.delete(1.0, tk.END)
         self.metrics_text.insert(1.0, metrics_json)
+        self.metrics_text.config(state=tk.DISABLED)
         
         self.notebook.select(1)  # Switch to results tab
     
@@ -1109,13 +1142,17 @@ SLICE-BY-SLICE
         for s in result['slices']:
             results_text += f"{s['slice']:<8} {s['porosity']:<11.1f}% {s['num_holes']:<10.0f} {s['mean_diameter_mm']:<11.2f}mm\n"
         
+        self.results_text.config(state=tk.NORMAL)
         self.results_text.delete(1.0, tk.END)
         self.results_text.insert(1.0, results_text)
+        self.results_text.config(state=tk.DISABLED)
         
         # Display full report JSON
         report_json = json.dumps(result, indent=2)
+        self.metrics_text.config(state=tk.NORMAL)
         self.metrics_text.delete(1.0, tk.END)
         self.metrics_text.insert(1.0, report_json)
+        self.metrics_text.config(state=tk.DISABLED)
         
         # Display consistency analysis
         self.display_loaf_consistency()
@@ -1216,7 +1253,8 @@ SLICE-BY-SLICE
                 room_temp_c=float(recipe_data.get('room_temp_c')) if recipe_data.get('room_temp_c') else None,
                 room_humidity_pct=float(recipe_data.get('room_humidity_pct')) if recipe_data.get('room_humidity_pct') else None,
                 altitude_m=float(recipe_data.get('altitude_m')) if recipe_data.get('altitude_m') else None,
-                bread_type=recipe_data.get('type', 'other')
+                bread_type=recipe_data.get('type', 'other'),
+                steps=recipe_data.get('steps', [])
             )
             
             self.refresh_recipe_list()
@@ -1237,7 +1275,7 @@ SLICE-BY-SLICE
             return
         
         # Create a simple variant dialog
-        variant_name = messagebox.showinput("Create Variant", f"Enter name for variant of '{parent['name']}':")
+        variant_name = simpledialog.askstring("Create Variant", f"Enter name for variant of '{parent['name']}':")
         
         if not variant_name:
             return
@@ -1491,6 +1529,7 @@ FEATURE CONTRIBUTIONS:
     
     def display_statistics_dashboard(self):
         """Display comprehensive statistics dashboard"""
+        self.stats_text.config(state=tk.NORMAL)
         self.stats_text.delete("1.0", tk.END)
         
         try:
@@ -1558,11 +1597,13 @@ FEATURE CONTRIBUTIONS:
             output += "\n(*** p<0.05 = significant, ** p<0.1 = marginally significant)\n"
             
             self.stats_text.insert("1.0", output)
+            self.stats_text.config(state=tk.DISABLED)
             self.set_status(" Statistics dashboard refreshed", self.success_color)
             
         except Exception as e:
             output = f"Error generating statistics dashboard:\n\n{str(e)}\n\n{traceback.format_exc()}"
             self.stats_text.insert("1.0", output)
+            self.stats_text.config(state=tk.DISABLED)
             self.set_status("✗ Statistics dashboard error", self.error_color)
     
     def compare_recipes(self):
@@ -1603,8 +1644,10 @@ FEATURE CONTRIBUTIONS:
             output += f"Best Porosity: {max(porosities):.1f}%\n"
             output += f"Worst Porosity: {min(porosities):.1f}%\n"
         
+        self.compare_text.config(state=tk.NORMAL)
         self.compare_text.delete("1.0", tk.END)
         self.compare_text.insert("1.0", output)
+        self.compare_text.config(state=tk.DISABLED)
         self.notebook.select(5)  # Switch to comparison tab
         self.set_status(" Recipes compared", self.success_color)
     
@@ -1660,16 +1703,20 @@ FEATURE CONTRIBUTIONS:
                 output += f"  Predicted Porosity: {pred_porosity:.1f}% (Δ {diff:+.1f}%)\n"
             output += "\n"
         
+        self.compare_text.config(state=tk.NORMAL)
         self.compare_text.delete("1.0", tk.END)
         self.compare_text.insert("1.0", output)
+        self.compare_text.config(state=tk.DISABLED)
         self.notebook.select(5)  # Switch to comparison tab
         self.set_status(" What-if analysis complete", self.success_color)
     
     def display_loaf_consistency(self):
         """Display loaf consistency analysis for multi-slice data"""
         if not self.analysis_result:
+            self.consist_text.config(state=tk.NORMAL)
             self.consist_text.delete("1.0", tk.END)
             self.consist_text.insert("1.0", "No loaf analysis data available.\n\nPerform a loaf analysis first by:\n1. Selecting 'Loaf Analysis' mode\n2. Entering a loaf name\n3. Ensuring multiple slices exist in the results")
+            self.consist_text.config(state=tk.DISABLED)
             return
         
         result = self.analysis_result
@@ -1770,8 +1817,10 @@ FEATURE CONTRIBUTIONS:
             output += f"Perimeter: {metrics.get('perimeter', 'N/A'):.0f} pixels\n"
             output += f"Area: {metrics.get('area', 'N/A'):.0f} pixels²\n"
         
+        self.consist_text.config(state=tk.NORMAL)
         self.consist_text.delete("1.0", tk.END)
         self.consist_text.insert("1.0", output)
+        self.consist_text.config(state=tk.DISABLED)
 
     # ==================== BREAD TYPE PROFILE METHODS ====================
     

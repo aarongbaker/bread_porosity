@@ -16,7 +16,20 @@
     "cook_time_min": 40,
     "measured_porosity": 28.5,
     "porosity_measured_at": "2026-01-10T14:30:00",
-    "notes": "75% hydration, overnight fermentation, good oven spring"
+    "notes": "75% hydration, overnight fermentation, good oven spring",
+    "steps": [
+      "Mix flour and water, autolyse for 30 minutes",
+      "Add starter and salt, mix until combined (10 min)",
+      "Perform 4 sets of stretch and folds, 30 min apart",
+      "Bulk ferment at room temp for 4-5 hours until doubled",
+      "Pre-shape and rest 20 minutes",
+      "Final shape and place in banneton",
+      "Cold retard in fridge overnight (8-12 hours)",
+      "Preheat dutch oven at 450°F/230°C for 1 hour",
+      "Score dough and bake covered for 20 minutes",
+      "Remove lid and bake 20 more minutes until deep brown",
+      "Cool on wire rack for at least 1 hour before slicing"
+    ]
   },
   {
     "id": 2,
@@ -35,7 +48,21 @@
     "cook_time_min": 38,
     "measured_porosity": 32.1,
     "porosity_measured_at": "2026-01-11T14:45:00",
-    "notes": "76% hydration, extra water increased hole size significantly"
+    "notes": "76% hydration, extra water increased hole size significantly",
+    "steps": [
+      "Mix flour and water, autolyse for 45 minutes",
+      "Add starter and salt, use pincer method to incorporate (15 min)",
+      "Perform 6 sets of stretch and folds, 30 min apart (handle gently)",
+      "Coil folds work better than stretch and folds for high hydration",
+      "Bulk ferment at room temp for 5-6 hours until jiggly and domed",
+      "Wet hands and gently pre-shape, rest 30 minutes",
+      "Final shape using flour generously, place in well-floured banneton",
+      "Cold retard in fridge overnight (10-14 hours)",
+      "Preheat dutch oven at 475°F/245°C for 1 hour",
+      "Score quickly and confidently, bake covered 20 minutes",
+      "Remove lid and bake 18 more minutes until deep golden",
+      "Cool completely before cutting (2 hours minimum)"
+    ]
   },
   {
     "id": 3,
@@ -54,7 +81,21 @@
     "cook_time_min": 42,
     "measured_porosity": 22.3,
     "porosity_measured_at": "2026-01-12T14:15:00",
-    "notes": "56% hydration, stiffer dough, smaller holes but more uniform"
+    "notes": "56% hydration, stiffer dough, smaller holes but more uniform",
+    "steps": [
+      "Mix flour and water until no dry spots remain",
+      "Autolyse for 20 minutes (stiffer dough needs less time)",
+      "Add starter and salt, knead for 8 minutes until smooth",
+      "Perform 3 sets of stretch and folds, 45 min apart",
+      "Bulk ferment at room temp for 3-4 hours until 50% increase",
+      "Pre-shape into tight ball, rest 15 minutes",
+      "Final shape with firm tension, place in banneton",
+      "Cold retard overnight or proof at room temp 2 hours",
+      "Preheat dutch oven at 440°F/225°C for 45 minutes",
+      "Score dough and bake covered 22 minutes",
+      "Remove lid and bake 20 more minutes",
+      "Cool on wire rack 1 hour before slicing"
+    ]
   },
   {
     "id": 4,
@@ -73,7 +114,22 @@
     "cook_time_min": 40,
     "measured_porosity": 30.8,
     "porosity_measured_at": "2026-01-13T16:00:00",
-    "notes": "24-hour fermentation (12h cold + 12h room temp), excellent flavor and open crumb"
+    "notes": "24-hour fermentation (12h cold + 12h room temp), excellent flavor and open crumb",
+    "steps": [
+      "Mix flour and water, autolyse for 1 hour",
+      "Add starter and salt, mix until combined (10 min)",
+      "Perform 4 sets of stretch and folds over 2 hours",
+      "Bulk ferment at room temp for 4 hours",
+      "Move to fridge for 12 hours cold bulk ferment",
+      "Remove from fridge and warm at room temp 2 hours",
+      "Pre-shape gently, rest 30 minutes",
+      "Final shape and place in banneton",
+      "Proof at room temp for 2 hours or until passes poke test",
+      "Preheat dutch oven at 450°F/230°C for 1 hour",
+      "Score and bake covered 20 minutes",
+      "Remove lid and bake 20 more minutes",
+      "Cool completely for best flavor development (2+ hours)"
+    ]
   },
   {
     "id": 5,
@@ -92,7 +148,22 @@
     "cook_time_min": 36,
     "measured_porosity": 24.2,
     "porosity_measured_at": "2026-01-14T13:30:00",
-    "notes": "Higher starter ratio for faster fermentation, shorter bulk ferment"
+    "notes": "Higher starter ratio for faster fermentation, shorter bulk ferment",
+    "steps": [
+      "Use very active starter at peak (just doubled)",
+      "Mix flour, water, starter, and salt together (10 min)",
+      "Skip autolyse for speed",
+      "Perform 3 sets of stretch and folds, 20 min apart",
+      "Bulk ferment in warm spot (78°F/25°C) for 2-3 hours",
+      "Watch dough closely - it will rise faster",
+      "Pre-shape and rest 15 minutes",
+      "Final shape and place in banneton",
+      "Short proof at room temp 1 hour or until puffy",
+      "Preheat dutch oven at 480°F/250°C for 45 minutes",
+      "Score and bake covered 18 minutes",
+      "Remove lid and bake 18 more minutes at high heat",
+      "Cool at least 45 minutes before slicing"
+    ]
   },
   {
     "id": 6,
@@ -114,6 +185,21 @@
     "cook_time_min": 45,
     "measured_porosity": 18.5,
     "porosity_measured_at": "2026-01-14T15:00:00",
-    "notes": "Commercial yeast, short fermentation, soft crumb for slicing"
+    "notes": "Commercial yeast, short fermentation, soft crumb for slicing",
+    "steps": [
+      "Warm milk to 110°F/43°C, dissolve yeast and sugar, let bloom 5 min",
+      "Mix flour and salt in large bowl",
+      "Add yeast mixture and softened butter",
+      "Knead for 15-20 minutes until smooth and elastic (windowpane test)",
+      "Place in greased bowl, cover, rise until doubled (1 hour)",
+      "Punch down and let rest 5 minutes",
+      "Shape into log and place in greased 9x5 loaf pan",
+      "Cover and proof until dough rises 1 inch above pan rim (45 min)",
+      "Preheat oven to 400°F/200°C",
+      "Brush top with melted butter or egg wash (optional)",
+      "Bake 40-45 minutes until golden and internal temp reaches 190°F/88°C",
+      "Remove from pan immediately and cool on wire rack",
+      "Cool completely before slicing for clean cuts"
+    ]
   }
 ]

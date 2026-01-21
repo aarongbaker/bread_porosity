@@ -57,6 +57,9 @@ class RecipeBuilderForm:
         # Tab 4: Environment
         self._create_environment_tab(notebook)
         
+        # Tab 5: Steps
+        self._create_steps_tab(notebook)
+        
         # Buttons at bottom
         button_frame = tk.Frame(self.window, bg=self.bg_primary)
         button_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
@@ -260,6 +263,80 @@ class RecipeBuilderForm:
         tk.Label(inner, text=help_text, font=("Segoe UI", 8), fg=self.text_secondary,
                 bg=self.bg_secondary, justify=tk.LEFT).pack(anchor=tk.W, pady=(10, 0))
     
+    def _create_steps_tab(self, notebook):
+        """Create recipe steps tab."""
+        frame = ttk.Frame(notebook)
+        notebook.add(frame, text="Steps")
+        
+        inner = tk.Frame(frame, bg=self.bg_secondary)
+        inner.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
+        
+        # Header
+        tk.Label(inner, text="Recipe Steps", font=("Segoe UI", 10, "bold"),
+                fg=self.text_primary, bg=self.bg_secondary).pack(anchor=tk.W, pady=(0, 5))
+        
+        tk.Label(inner, text="Enter each step on a new line:", font=("Segoe UI", 8),
+                fg=self.text_secondary, bg=self.bg_secondary).pack(anchor=tk.W, pady=(0, 10))
+        
+        # Steps text area with scrollbar
+        steps_frame = tk.Frame(inner, bg=self.bg_secondary)
+        steps_frame.pack(fill=tk.BOTH, expand=True)
+        
+        steps_scroll = ttk.Scrollbar(steps_frame)
+        steps_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        self.fields['steps'] = tk.Text(steps_frame, height=15, width=50, 
+                                       bg=self.bg_primary, fg=self.text_primary,
+                                       relief=tk.FLAT, yscrollcommand=steps_scroll.set,
+                                       font=("Segoe UI", 9), padx=8, pady=8)
+        self.fields['steps'].pack(fill=tk.BOTH, expand=True)
+        steps_scroll.config(command=self.fields['steps'].yview)
+        
+        # Populate existing steps
+        existing_steps = self.recipe.get('steps', [])
+        if existing_steps:
+            self.fields['steps'].insert(1.0, '\n'.join(existing_steps))
+        else:
+            # Default template
+            default_steps = """Mix dry ingredients
+Add water and combine
+Autolyse for 30 minutes
+Add starter/yeast and salt
+Knead or stretch and fold
+Bulk ferment until doubled
+Shape the dough
+Final proof
+Preheat oven
+Score and bake
+Cool before slicing"""
+            self.fields['steps'].insert(1.0, default_steps)
+        
+        # Quick-add buttons
+        btn_frame = tk.Frame(inner, bg=self.bg_secondary)
+        btn_frame.pack(fill=tk.X, pady=(10, 0))
+        
+        tk.Label(btn_frame, text="Quick Add:", font=("Segoe UI", 8),
+                fg=self.text_secondary, bg=self.bg_secondary).pack(side=tk.LEFT, padx=(0, 10))
+        
+        quick_steps = [
+            ("Stretch & Fold", "Perform stretch and fold"),
+            ("Bulk Ferment", "Bulk ferment at room temp until doubled"),
+            ("Cold Retard", "Cold retard in fridge overnight"),
+            ("Preheat", "Preheat oven with dutch oven inside")
+        ]
+        
+        for label, step in quick_steps:
+            ttk.Button(btn_frame, text=label, width=12,
+                      command=lambda s=step: self._add_step(s)).pack(side=tk.LEFT, padx=2)
+    
+    def _add_step(self, step_text):
+        """Add a step to the steps text area."""
+        current = self.fields['steps'].get(1.0, tk.END).strip()
+        if current:
+            self.fields['steps'].insert(tk.END, f"\n{step_text}")
+        else:
+            self.fields['steps'].insert(1.0, step_text)
+    
     def _save_recipe(self):
         """Save the recipe."""
         try:
@@ -295,6 +372,13 @@ class RecipeBuilderForm:
                         recipe[field] = value
                 except ValueError:
                     pass
+            
+            # Add steps (parse from text, one step per line)
+            steps_text = self.fields['steps'].get(1.0, tk.END).strip()
+            if steps_text:
+                steps = [s.strip() for s in steps_text.split('\n') if s.strip()]
+                if steps:
+                    recipe['steps'] = steps
             
             # Call save callback
             if self.on_save(recipe):

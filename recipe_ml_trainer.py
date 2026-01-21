@@ -123,7 +123,7 @@ class MLModelTrainer:
                 cv_scores = cross_validate(
                     model, X_scaled, y,
                     cv=kfold,
-                    scoring={'r2': 'r2_score', 'mae': 'neg_mean_absolute_error', 'rmse': 'neg_mean_squared_error'},
+                    scoring={'r2': 'r2', 'mae': 'neg_mean_absolute_error', 'mse': 'neg_mean_squared_error'},
                     n_jobs=-1 if model_name != 'linear' else 1
                 )
                 
@@ -139,10 +139,10 @@ class MLModelTrainer:
                 # Store results
                 results["models"][model_name] = {
                     "trained": True,
-                    "cv_r2_mean": float(cv_scores['r2'].mean()),
-                    "cv_r2_std": float(cv_scores['r2'].std()),
-                    "cv_mae_mean": float(-cv_scores['mae'].mean()),
-                    "cv_mae_std": float(cv_scores['mae'].std()),
+                    "cv_r2_mean": float(cv_scores['test_r2'].mean()),
+                    "cv_r2_std": float(cv_scores['test_r2'].std()),
+                    "cv_mae_mean": float(-cv_scores['test_mae'].mean()),
+                    "cv_mae_std": float(cv_scores['test_mae'].std()),
                     "train_r2": float(train_r2),
                     "train_mae": float(train_mae),
                     "train_rmse": float(train_rmse),
