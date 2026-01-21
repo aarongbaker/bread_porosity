@@ -31,7 +31,7 @@ setup(
     install_requires=requirements,
     entry_points={
         "console_scripts": [
-            "bread-porosity=gui:main",
+            "bread-porosity=gui.main:main",
         ],
     },
     classifiers=[

@@ -34,6 +34,7 @@ class FirstRunWizard:
             "backlit_setup": False,
             "reference_object": None,
         }
+        self.bread_vars = {}
     
     def _load_or_create_config(self):
         """Load config or return default."""
