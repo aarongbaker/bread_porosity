@@ -1,7 +1,7 @@
 # AI Agent Instructions for Bread Porosity Analysis Tool
 
 ## Project Summary
-Professional image processing tool for measuring bread crumb structure using **classical computer vision** (not ML). Analyzes porosity %, hole size/distribution, uniformity, and shape metrics. Includes GUI, recipe database, ML-based defect detection, and quality control with multiple bread type profiles.
+Professional image processing tool for measuring bread crumb structure using **classical computer vision** (not ML). Analyzes porosity %, hole size/distribution, uniformity, and shape metrics. Includes GUI, recipe database, and quality control with multiple bread type profiles.
 
 ## Architecture Overview
 
@@ -14,23 +14,19 @@ Professional image processing tool for measuring bread crumb structure using **c
 **Key principle**: Image quality and standardized setup matter MORE than algorithm tweaks. Lighting consistency, focus, exposure are foundational.
 
 ### User Interface
-- **`gui.py`** (2300+ lines) - Dark theme Material Design GUI with 9 tabs:
+- **`gui.py`** (2100+ lines) - Dark theme Material Design GUI with 8 tabs:
   - **Analysis**: Single image or multi-slice loaf mode
   - **Results**: Metrics display and visualization
+  - **Recipes**: Database CRUD, variant generation, steps tracking
+  - **Statistics**: Recipe database statistics
   - **Consistency**: Batch uniformity metrics (loaf-level)
-  - **Quality Control**: Profile-based acceptance criteria with alerts
-  - **Recipe Management**: Database CRUD, variant generation
-  - **Prediction**: ML porosity prediction from recipe parameters
-  - **Defect Detection**: Automated uneven rise/dense spot detection
-  - **ML Classifier**: Train custom good/bad bread classifier
+  - **Compare**: Side-by-side recipe comparison
   - **Export**: CSV, Excel, PDF reporting
+  - **Quality Control**: Profile-based acceptance criteria with alerts
 
 ### Domain-Specific Modules
 - **`quality_control.py`** - QC profiles for 5 bread types (sourdough, whole wheat, ciabatta, sandwich, baguette) with thresholds, SPC statistics, alert system
-- **`recipe_database.py`** - Recipe CRUD, porosity tracking, variant scaling
-- **`recipe_predictor.py`** - ML predictions of porosity from recipe parameters
-- **`defect_detection.py`** - Detects structural defects (uneven rise, dense spots)
-- **`ml_simple.py`** - Custom classifier training on user's bread images
+- **`recipe_database.py`** - Recipe CRUD, porosity tracking, variant scaling, steps support
 - **`export_reporting.py`** - Multi-format exports with charts
 
 ## Data Flow
@@ -105,21 +101,11 @@ Creates SQLite-backed recipe database automatically; config files generated on f
 - **Module**: `loaf_analyzer.py` analyzes consistency across slices, computes uniformity metrics
 - **Results**: Per-slice metrics + batch statistics (mean, std dev, CV)
 
-### Recipe-to-Porosity Prediction
-- **Flow**: Recipe ingredients/parameters → `recipe_predictor.py` → ML model → predicted_porosity
-- **Training data**: Built from actual measurements stored in recipe database
-- **Use case**: Predict porosity before baking to inform adjustments
-
 ### QC Profile Selection
 - **In GUI**: Dropdown selects bread type profile from `qc_config.json`
 - **Alert thresholds**: Each profile has warning (yellow) and fail (red) ranges
 - **SPC stats**: Tracks batch mean/StdDev; alerts on trends or out-of-spec measurements
 - **Custom profiles**: Add new bread type with `QualityControlManager.add_bread_type()`
-
-### Defect Detection
-- **Uneven rise**: Spatial gradient analysis to detect asymmetric crumb development
-- **Dense spots**: Low-threshold region detection for under-fermented zones
-- **Output**: Severity score (0-100) + annotated image with marked defect regions
 
 ## Common Gotchas & Solutions
 
@@ -129,7 +115,6 @@ Creates SQLite-backed recipe database automatically; config files generated on f
 | Blurry hole edges / poor segmentation | Increase `--pixel-size` tolerance or switch to `adaptive` thresholding in GUI. Verify focus (Laplacian variance >500). |
 | Lighting artifacts in results | Try `morphology` or `gaussian` normalization instead of CLAHE. Ensure backlit setup is uniform. |
 | GUI won't start | Verify tkinter installed: `pip install tk` (often missing on Linux). Check Python version >=3.9. |
-| Recipe predictions inaccurate | Need >20 training samples in database. Check that `measured_porosity` is populated when adding recipes. |
 
 ## Adding New Bread Type Profiles
 

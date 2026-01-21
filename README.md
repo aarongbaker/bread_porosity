@@ -1,6 +1,6 @@
 # Bread Porosity Analysis Tool
 
-**Professional image processing software for measuring bread porosity, crumb structure, and quality metrics with machine learning predictions and real-time quality control.**
+**Professional image processing software for measuring bread porosity, crumb structure, and quality metrics with real-time quality control.**
 
 ![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
 ![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
@@ -18,9 +18,8 @@
 - **Statistical Dashboard** - Comprehensive metrics and visualizations
 
 ### Recipe Management
-- **Recipe Database** - Store bread recipes with formulas
-- **Porosity Prediction** - ML predictions from recipe parameters
-- **Recipe Comparison** - Compare multiple recipes
+- **Recipe Database** - Store bread recipes with formulas and steps
+- **Recipe Comparison** - Compare multiple recipes side-by-side
 - **Variant Creation** - Generate variants by scaling
 - **Recipe Families** - Track recipe lineage
 
@@ -32,13 +31,6 @@
 - **Alert System** - Real-time alerts for out-of-spec batches
 - **Custom Profiles** - Define your own standards
 
-### AI & Defect Detection (NEW)
-- **Automated Defect Detection** - Identifies uneven rise and dense spots
-- **Simple ML Classifier** - Train on your own images to classify good/problem bread
-- **No Dataset Required** - Build training data as you analyze bread
-- **Batch Analysis** - Analyze multiple images at once
-- **Confidence Scoring** - Know how certain predictions are
-
 ### Export & Reporting
 - **Multiple Formats** - CSV, Excel, PDF exports
 - **Summary Charts** - Porosity trends, distributions
@@ -47,7 +39,7 @@
 
 ### Modern UI
 - **Dark Professional Theme** - Material Design inspired
-- **9 Organized Tabs** - Logical workflow
+- **8 Organized Tabs** - Logical workflow
 - **Real-time Status** - Live feedback
 - **Responsive Design** - Clean and intuitive
 
@@ -170,8 +162,6 @@ bread_porosity/
 | Compare | Recipe comparison |
 | Export | Data export |
 | Quality Control | QC & profiles |
-| Defects | Defect detection & analysis |
-| ML Training | Machine learning classifier |
 
 ---
 
@@ -181,7 +171,6 @@ bread_porosity/
 - **[Features](FEATURES.md)** - Complete feature reference
 - **[Installation](INSTALLATION.md)** - Detailed setup
 - **[Bread Type Profiles](BREAD_TYPE_PROFILES.md)** - Profile system
-- **[ML & Defects](ML_AND_DEFECTS.md)** - AI features guide
 - **[GitHub Safe](GITHUB_SAFE.md)** - Production version
 
 ---
@@ -297,45 +286,6 @@ Compare tab → Select recipes → View side-by-side
 
 ### Generate Report
 Export tab → Select format → Click Export
-
----
-
-## Machine Learning - Porosity Prediction
-
-The system includes an **advanced ML system** for predicting bread porosity based on recipe parameters.
-
-**Start here:** [ML_COMPLETE_GUIDE.md](ML_COMPLETE_GUIDE.md) - Complete guide with examples
-
-**Key capabilities:**
-- Predict porosity from ingredients and baking instructions
-- Analyze impact of recipe changes
-- Train ensemble models from measured porosity data
-- 20+ automatically engineered features
-- Interactive prediction and sensitivity analysis
-
-**Quick example:**
-```python
-from recipe_predictor import RecipePredictor
-from recipe_database import RecipeDatabase
-
-db = RecipeDatabase("recipes_example.json")
-recipes = db.get_all_recipes()
-predictor = RecipePredictor(recipes, use_advanced_ml=True)
-
-recipe = {
-    "ingredients": {"bread flour": 500, "water": 350, "salt": 10},
-    "mixing_time_min": 10,
-    "proof_time_min": 480,
-    "oven_temp_c": 450,
-    "cooking_vessel": "dutch oven",
-    "cook_time_min": 40
-}
-
-predicted_porosity, details = predictor.predict_porosity(recipe)
-print(f"Predicted: {predicted_porosity:.1f}%")
-```
-
-See [ML_COMPLETE_GUIDE.md](ML_COMPLETE_GUIDE.md#quick-start) for 5-minute quick start, detailed examples, and architecture documentation.
 
 ---
 

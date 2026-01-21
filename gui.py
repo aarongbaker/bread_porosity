@@ -13,11 +13,8 @@ from datetime import datetime
 from analyze import analyze_bread_image
 from loaf_analyzer import analyze_loaf
 from recipe_database import RecipeDatabase
-from recipe_predictor import RecipePredictor
 from export_reporting import ExportEngine
 from quality_control import QualityControlManager
-from defect_detection import DefectDetector
-from ml_simple import SimpleMLClassifier
 import traceback
 
 # NEW: Import usability improvements
@@ -131,9 +128,8 @@ class BreadPorositytoolGUI:
         for d in [self.unprocessed_dir, self.processed_dir, self.results_dir, self.output_dir]:
             d.mkdir(exist_ok=True)
         
-        # Initialize recipe database and predictor
+        # Initialize recipe database
         self.recipe_db = RecipeDatabase("recipes.json")
-        self.recipe_predictor = RecipePredictor(self.recipe_db.get_recipes_with_porosity())
         
         # Initialize export and quality control managers
         self.export_engine = ExportEngine(output_dir=str(self.output_dir))
@@ -489,8 +485,6 @@ class BreadPorositytoolGUI:
                   command=self.log_new_recipe).pack(fill=tk.X, pady=(0, 6))
         ttk.Button(recipe_btn_frame, text=" Save Porosity", 
                   command=self.save_recipe_porosity).pack(fill=tk.X, pady=(0, 6))
-        ttk.Button(recipe_btn_frame, text=" Predict", 
-                  command=self.predict_from_recipe).pack(fill=tk.X, pady=(0, 6))
         ttk.Button(recipe_btn_frame, text=" Create Variant", 
                   command=self.create_recipe_variant).pack(fill=tk.X, pady=(0, 6))
         ttk.Button(recipe_btn_frame, text=" Clone Recipe", 
@@ -501,19 +495,6 @@ class BreadPorositytoolGUI:
                   command=self.display_recipe_family).pack(fill=tk.X, pady=(0, 6))
         ttk.Button(recipe_btn_frame, text="  Delete", 
                   command=self.delete_recipe).pack(fill=tk.X)
-        
-        # Prediction results
-        ttk.Label(right_recipe, text="Prediction Results:").pack(anchor=tk.W, pady=(10, 0))
-        
-        pred_scroll = ttk.Scrollbar(right_recipe)
-        pred_scroll.pack(side=tk.RIGHT, fill=tk.Y)
-        
-        self.prediction_text = tk.Text(right_recipe, yscrollcommand=pred_scroll.set,
-                                      font=("Consolas", 9), bg=self.bg_secondary,
-                                      fg=self.text_primary, relief=tk.FLAT,
-                                      borderwidth=0, padx=8, pady=8, height=10)
-        self.prediction_text.pack(fill=tk.BOTH, expand=True)
-        pred_scroll.config(command=self.prediction_text.yview)
         
         # Statistics Dashboard tab
         stats_tab = ttk.Frame(self.notebook)
@@ -577,8 +558,6 @@ class BreadPorositytoolGUI:
         compare_btn_frame.pack(fill=tk.X, padx=12, pady=(0, 12))
         ttk.Button(compare_btn_frame, text=" Compare Recipes", 
                   command=self.compare_recipes).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(compare_btn_frame, text=" What-If Analysis", 
-                  command=self.what_if_analysis).pack(side=tk.LEFT)
         
         # Export & Reporting tab
         export_tab = ttk.Frame(self.notebook)
@@ -690,241 +669,6 @@ class BreadPorositytoolGUI:
                                insertbackground=self.bg_accent)
         self.qc_text.pack(fill=tk.BOTH, expand=True)
         qc_scroll.config(command=self.qc_text.yview)
-        
-        # Defect Detection Tab
-        defect_tab = ttk.Frame(self.notebook)
-        self.notebook.add(defect_tab, text="  Defects")
-        
-        defect_container = tk.Frame(defect_tab, bg=self.bg_secondary)
-        defect_container.pack(fill=tk.BOTH, expand=True, padx=12, pady=12)
-        
-        defect_header = tk.Label(defect_container, text="Defect Detection", 
-                                font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
-        defect_header.pack(anchor=tk.W, pady=(0, 10))
-        
-        defect_controls = tk.Frame(defect_container, bg=self.bg_secondary)
-        defect_controls.pack(fill=tk.X, pady=(0, 10))
-        
-        ttk.Button(defect_controls, text="Analyze Current Image", 
-                  command=self.detect_defects_current).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(defect_controls, text="Batch Analysis", 
-                  command=self.detect_defects_batch).pack(side=tk.LEFT, padx=(0, 5))
-        
-        defect_scroll = ttk.Scrollbar(defect_container)
-        defect_scroll.pack(side=tk.RIGHT, fill=tk.Y)
-        
-        self.defect_text = tk.Text(defect_container, yscrollcommand=defect_scroll.set,
-                                  font=("Consolas", 9), bg=self.bg_tertiary,
-                                  fg=self.text_primary, relief=tk.FLAT,
-                                  borderwidth=0, padx=12, pady=12,
-                                  insertbackground=self.bg_accent)
-        self.defect_text.pack(fill=tk.BOTH, expand=True)
-        defect_scroll.config(command=self.defect_text.yview)
-        
-        self.defect_detector = DefectDetector(verbose=False)
-        
-        # ML Training Tab
-        ml_tab = ttk.Frame(self.notebook)
-        self.notebook.add(ml_tab, text="  ML Training")
-        
-        ml_container = tk.Frame(ml_tab, bg=self.bg_secondary)
-        ml_container.pack(fill=tk.BOTH, expand=True, padx=12, pady=12)
-        
-        ml_header = tk.Label(ml_container, text="Machine Learning Classifier", 
-                            font=("Segoe UI", 11, "bold"), fg=self.text_primary, bg=self.bg_secondary)
-        ml_header.pack(anchor=tk.W, pady=(0, 10))
-        
-        ml_top_frame = tk.Frame(ml_container, bg=self.bg_secondary)
-        ml_top_frame.pack(fill=tk.X, pady=(0, 10))
-        
-        # Training data status
-        ml_status_label = tk.Label(ml_top_frame, text="Training Data:", 
-                                  font=("Segoe UI", 9), fg=self.text_secondary, bg=self.bg_secondary)
-        ml_status_label.pack(anchor=tk.W)
-        
-        self.ml_status_text = tk.Label(ml_top_frame, text="No data loaded", 
-                                      font=("Segoe UI", 8), fg=self.text_secondary, bg=self.bg_secondary)
-        self.ml_status_text.pack(anchor=tk.W)
-        
-        # Training buttons
-        ml_buttons = tk.Frame(ml_top_frame, bg=self.bg_secondary)
-        ml_buttons.pack(fill=tk.X, pady=(10, 0))
-        
-        ttk.Button(ml_buttons, text="Add Good Image", 
-                  command=lambda: self.ml_add_image("good")).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(ml_buttons, text="Add Problem Image", 
-                  command=lambda: self.ml_add_image("problem")).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(ml_buttons, text="Train Model", 
-                  command=self.ml_train).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(ml_buttons, text="Predict Current", 
-                  command=self.ml_predict_current).pack(side=tk.LEFT)
-        
-        ml_scroll = ttk.Scrollbar(ml_container)
-        ml_scroll.pack(side=tk.RIGHT, fill=tk.Y)
-        
-        self.ml_text = tk.Text(ml_container, yscrollcommand=ml_scroll.set,
-                              font=("Consolas", 9), bg=self.bg_tertiary,
-                              fg=self.text_primary, relief=tk.FLAT,
-                              borderwidth=0, padx=12, pady=12,
-                              insertbackground=self.bg_accent)
-        self.ml_text.pack(fill=tk.BOTH, expand=True)
-        ml_scroll.config(command=self.ml_text.yview)
-        
-        self.ml_classifier = SimpleMLClassifier(verbose=False)
-        self.update_ml_status()
-    
-    def detect_defects_current(self):
-        """Analyze current image for defects"""
-        if not self.current_image_path:
-            messagebox.showwarning("Warning", "Please select an image first")
-            return
-        
-        self.defect_text.delete(1.0, tk.END)
-        self.set_status("Analyzing defects...", color=self.bg_accent)
-        
-        try:
-            result = self.defect_detector.detect_defects(str(self.current_image_path))
-            
-            output = f"DEFECT ANALYSIS REPORT\n"
-            output += f"{'=' * 60}\n\n"
-            output += f"Image: {Path(self.current_image_path).name}\n"
-            output += f"Overall Severity: {result['overall_severity']:.1f}/100\n"
-            output += f"Grade: {result['defect_grade']}\n\n"
-            
-            output += f"UNEVEN RISE\n{'-' * 60}\n"
-            output += f"  Detected: {'Yes' if result['uneven_rise']['detected'] else 'No'}\n"
-            output += f"  Severity: {result['uneven_rise']['severity']:.1f}/100\n"
-            output += f"  Center Brightness: {result['uneven_rise']['center_brightness']:.0f}\n"
-            output += f"  Edge Brightness: {result['uneven_rise']['edge_brightness']:.0f}\n\n"
-            
-            output += f"DENSE SPOTS\n{'-' * 60}\n"
-            output += f"  Detected: {'Yes' if result['dense_spots']['detected'] else 'No'}\n"
-            output += f"  Severity: {result['dense_spots']['severity']:.1f}/100\n"
-            output += f"  Dense Percentage: {result['dense_spots']['dense_percentage']:.2f}%\n"
-            output += f"  Number of Clusters: {result['dense_spots']['num_clusters']}\n\n"
-            
-            output += f"RECOMMENDATIONS\n{'-' * 60}\n"
-            for rec in result['recommendations']:
-                output += f"  - {rec}\n"
-            
-            self.defect_text.insert(1.0, output)
-            self.set_status("Defect analysis complete", color=self.success_color)
-            
-        except Exception as e:
-            self.defect_text.insert(1.0, f"Error: {str(e)}\n{traceback.format_exc()}")
-            self.set_status(f"Error: {str(e)}", color=self.error_color)
-    
-    def detect_defects_batch(self):
-        """Analyze batch for defects"""
-        if not self.unprocessed_dir.exists():
-            messagebox.showwarning("Warning", "No images directory found")
-            return
-        
-        self.defect_text.delete(1.0, tk.END)
-        self.set_status("Analyzing batch defects...", color=self.bg_accent)
-        
-        try:
-            results = self.defect_detector.batch_detect(str(self.unprocessed_dir))
-            
-            if 'error' in results:
-                self.defect_text.insert(1.0, f"Error: {results['error']}")
-                return
-            
-            output = f"BATCH DEFECT ANALYSIS\n"
-            output += f"{'=' * 60}\n\n"
-            output += f"Images Analyzed: {results['num_images']}\n"
-            output += f"Average Severity: {results['avg_severity']:.1f}/100\n"
-            output += f"Batch Grade: {results['batch_grade']}\n"
-            output += f"Pass Rate: {results['pass_rate']:.1f}%\n\n"
-            
-            output += f"DEFECT SUMMARY\n{'-' * 60}\n"
-            output += f"  Uneven Rise: {results['uneven_rise_count']} images\n"
-            output += f"  Dense Spots: {results['dense_spots_count']} images\n\n"
-            
-            output += f"INDIVIDUAL RESULTS\n{'-' * 60}\n"
-            for i, result in enumerate(results['results'], 1):
-                output += f"\n{i}. {Path(result['image_path']).name}\n"
-                output += f"   Severity: {result['overall_severity']:.1f} ({result['defect_grade']})\n"
-            
-            self.defect_text.insert(1.0, output)
-            self.set_status("Batch analysis complete", color=self.success_color)
-            
-        except Exception as e:
-            self.defect_text.insert(1.0, f"Error: {str(e)}\n{traceback.format_exc()}")
-            self.set_status(f"Error: {str(e)}", color=self.error_color)
-    
-    def update_ml_status(self):
-        """Update ML training status display"""
-        status = self.ml_classifier.get_training_status()
-        status_str = (f"Good: {status['good_images']} | Problem: {status['problem_images']} | "
-                     f"Total: {status['total_training_images']}")
-        if status['model_trained']:
-            status_str += " | Model: TRAINED"
-        self.ml_status_text.config(text=status_str)
-    
-    def ml_add_image(self, label):
-        """Add image to ML training set"""
-        if not self.current_image_path:
-            messagebox.showwarning("Warning", "Please select an image first")
-            return
-        
-        success = self.ml_classifier.add_training_image(str(self.current_image_path), label)
-        if success:
-            self.update_ml_status()
-            self.ml_text.insert(tk.END, f"Added {label} image: {self.current_image_path.name}\n")
-            self.ml_text.see(tk.END)
-            messagebox.showinfo("Success", f"Added image as '{label}'")
-        else:
-            messagebox.showerror("Error", "Could not add image")
-    
-    def ml_train(self):
-        """Train ML model"""
-        status = self.ml_classifier.get_training_status()
-        if not status['ready_to_train']:
-            messagebox.showwarning("Not Ready", 
-                f"Need at least 1 good and 1 problem image\nCurrent: {status['good_images']} good, {status['problem_images']} problem")
-            return
-        
-        result = self.ml_classifier.train()
-        if result:
-            self.ml_text.delete(1.0, tk.END)
-            output = f"MODEL TRAINING COMPLETE\n"
-            output += f"{'=' * 60}\n"
-            output += f"Good Images: {result['good_count']}\n"
-            output += f"Problem Images: {result['problem_count']}\n"
-            output += f"Total Training Images: {result['total_training_images']}\n"
-            output += f"Model Status: READY\n\n"
-            output += f"You can now make predictions on new images!"
-            self.ml_text.insert(1.0, output)
-            self.update_ml_status()
-            messagebox.showinfo("Success", "Model trained successfully!")
-    
-    def ml_predict_current(self):
-        """Predict on current image"""
-        if not self.current_image_path:
-            messagebox.showwarning("Warning", "Please select an image first")
-            return
-        
-        status = self.ml_classifier.get_training_status()
-        if not status['model_trained']:
-            messagebox.showwarning("Not Ready", "Please train the model first")
-            return
-        
-        result = self.ml_classifier.predict(str(self.current_image_path))
-        
-        self.ml_text.delete(1.0, tk.END)
-        output = f"PREDICTION RESULT\n"
-        output += f"{'=' * 60}\n"
-        output += f"Image: {Path(self.current_image_path).name}\n"
-        output += f"Prediction: {result['prediction'].upper()}\n"
-        output += f"Confidence: {result['confidence']:.1f}%\n\n"
-        output += f"Confidence Breakdown\n{'-' * 60}\n"
-        output += f"  Good Match: {result['confidence_good']:.1f}%\n"
-        output += f"  Problem Match: {result['confidence_problem']:.1f}%\n"
-        
-        self.ml_text.insert(1.0, output)
-        messagebox.showinfo("Prediction", f"{result['prediction'].upper()}\nConfidence: {result['confidence']:.0f}%")
-    
     
     def refresh_image_list(self):
         """Refresh list of unprocessed images"""
@@ -1360,57 +1104,11 @@ SLICE-BY-SLICE
         )
         
         if success:
-            # Re-train predictor with new data
-            self.recipe_predictor = RecipePredictor(self.recipe_db.get_recipes_with_porosity())
-            
             self.refresh_recipe_list()
             self.set_status(f" Porosity saved: {porosity:.2f}%", self.success_color)
-            messagebox.showinfo("Success", f"Porosity {porosity:.2f}% saved to recipe!\n\nRecipe now has training data for predictions.")
+            messagebox.showinfo("Success", f"Porosity {porosity:.2f}% saved to recipe!")
         else:
             messagebox.showerror("Error", "Could not save porosity to recipe")
-    
-    def predict_from_recipe(self):
-        """Predict porosity for the selected recipe"""
-        if self.current_recipe_id is None:
-            messagebox.showwarning("Warning", "Please select a recipe first")
-            return
-        
-        recipe = self.recipe_db.get_recipe(self.current_recipe_id)
-        if not recipe:
-            messagebox.showerror("Error", "Recipe not found")
-            return
-        
-        # Make prediction
-        predicted_porosity, confidence_info = self.recipe_predictor.predict_porosity(recipe)
-        
-        # Display prediction results
-        result_text = f"""
-POROSITY PREDICTION FOR: {recipe['name']}
-{'='*50}
-
-PREDICTED POROSITY: {predicted_porosity:.1f}%
-
-CONFIDENCE LEVEL:
-  {confidence_info.get('confidence_level', 'Unknown')}
-  Training samples: {confidence_info.get('training_samples', 0)}
-  Mean porosity: {confidence_info.get('mean_porosity', 'N/A')}%
-
-FEATURE CONTRIBUTIONS:
-"""
-        
-        contributions = confidence_info.get('feature_contributions', {})
-        for feature, contribution in contributions.items():
-            result_text += f"  {feature:20} {contribution:+.3f}\n"
-        
-        if recipe.get('measured_porosity'):
-            result_text += f"\nACTUAL MEASURED: {recipe['measured_porosity']:.1f}%"
-            error = abs(predicted_porosity - recipe['measured_porosity'])
-            result_text += f"\nPREDICTION ERROR: {error:.1f}%"
-        
-        self.prediction_text.delete(1.0, tk.END)
-        self.prediction_text.insert(1.0, result_text)
-        
-        self.set_status(f" Prediction: {predicted_porosity:.1f}%", self.success_color)
     
     def delete_recipe(self):
         """Delete the selected recipe"""
@@ -1528,77 +1226,63 @@ FEATURE CONTRIBUTIONS:
             messagebox.showerror("Error", f"Scale failed:\n{str(e)}")
     
     def display_statistics_dashboard(self):
-        """Display comprehensive statistics dashboard"""
+        """Display recipe database statistics"""
         self.stats_text.config(state=tk.NORMAL)
         self.stats_text.delete("1.0", tk.END)
         
         try:
-            stats_data = self.recipe_predictor.get_statistics_dashboard()
+            recipes = self.recipe_db.get_all_recipes()
             
-            output = "STATISTICS DASHBOARD\n"
+            output = "RECIPE DATABASE STATISTICS\n"
             output += "=" * 60 + "\n\n"
             
-            # Training statistics
-            output += "TRAINING DATA\n"
+            # Recipe counts
+            output += "RECIPE SUMMARY\n"
             output += "-" * 60 + "\n"
-            train_stats = stats_data.get("training_stats", {})
-            output += f"Total Training Samples: {train_stats.get('training_samples', 0)}\n"
-            output += f"Mean Porosity: {train_stats.get('mean_porosity', 'N/A')}%\n"
-            output += f"Std Deviation: {train_stats.get('porosity_std', 'N/A')}%\n"
-            output += f"Range: {train_stats.get('porosity_min', 'N/A')}% - {train_stats.get('porosity_max', 'N/A')}%\n\n"
+            output += f"Total Recipes: {len(recipes)}\n"
             
-            # Model quality metrics
-            output += "MODEL QUALITY\n"
-            output += "-" * 60 + "\n"
-            output += f"R² (Coefficient of Determination): {stats_data.get('r_squared', 0):.3f}\n"
-            output += "  (1.0 = Perfect fit, 0.0 = Random)\n\n"
+            # Count recipes with measured porosity
+            recipes_with_porosity = [r for r in recipes if r.get('measured_porosity')]
+            output += f"Recipes with Measured Porosity: {len(recipes_with_porosity)}\n\n"
             
-            # Confidence intervals
-            output += "95% CONFIDENCE INTERVALS\n"
+            # Porosity statistics if we have data
+            if recipes_with_porosity:
+                porosities = [r['measured_porosity'] for r in recipes_with_porosity]
+                output += "POROSITY STATISTICS\n"
+                output += "-" * 60 + "\n"
+                output += f"Mean Porosity: {sum(porosities)/len(porosities):.1f}%\n"
+                output += f"Min Porosity: {min(porosities):.1f}%\n"
+                output += f"Max Porosity: {max(porosities):.1f}%\n"
+                if len(porosities) > 1:
+                    import statistics
+                    output += f"Std Deviation: {statistics.stdev(porosities):.1f}%\n"
+                output += "\n"
+            
+            # Recipe breakdown by type
+            output += "RECIPES BY TYPE\n"
             output += "-" * 60 + "\n"
-            ci_data = stats_data.get("confidence_intervals", {})
-            if ci_data:
-                for feature, (lower, upper) in ci_data.items():
-                    output += f"{feature:20} [{lower:6.2f}, {upper:6.2f}]\n"
+            bread_types = {}
+            for r in recipes:
+                btype = r.get('bread_type', 'unspecified')
+                bread_types[btype] = bread_types.get(btype, 0) + 1
+            for btype, count in sorted(bread_types.items()):
+                output += f"  {btype.title():<20} {count} recipes\n"
             output += "\n"
             
-            # Residual analysis
-            output += "RESIDUAL ANALYSIS\n"
+            # Recipe list with key stats
+            output += "RECIPE LIST\n"
             output += "-" * 60 + "\n"
-            residuals = stats_data.get("residuals", {})
-            res_stats = residuals.get("statistics", {})
-            output += f"Mean Residual: {res_stats.get('mean_residual', 'N/A')}\n"
-            output += f"Std of Residuals: {res_stats.get('std_residual', 'N/A')}\n"
-            output += f"Mean Absolute Error: {res_stats.get('mean_abs_error', 'N/A')}%\n"
-            output += f"Max Error: {res_stats.get('max_error', 'N/A')}%\n"
-            output += f"RMSE: {res_stats.get('rmse', 'N/A')}%\n\n"
-            
-            # Feature importance
-            output += "FEATURE IMPORTANCE RANKING\n"
+            output += f"{'Name':<25} {'Porosity':<12} {'Proof Time':<12}\n"
             output += "-" * 60 + "\n"
-            importance = stats_data.get("feature_importance", [])
-            if importance:
-                for i, (fname, corr, score) in enumerate(importance, 1):
-                    output += f"{i}. {fname:20} (corr={corr:+.3f}, score={score:.3f})\n"
-            else:
-                output += "No features computed yet\n"
-            output += "\n"
-            
-            # Feature correlations with p-values
-            output += "FEATURE CORRELATIONS WITH POROSITY\n"
-            output += "-" * 60 + "\n"
-            correlations = stats_data.get("correlations", {})
-            if correlations:
-                for fname, info in correlations.items():
-                    corr = info.get("correlation", 0)
-                    p_val = info.get("p_value", 1)
-                    sig = "***" if p_val < 0.05 else ("**" if p_val < 0.1 else "")
-                    output += f"{fname:20} {corr:+.3f}  (p={p_val:.3f}) {sig}\n"
-            output += "\n(*** p<0.05 = significant, ** p<0.1 = marginally significant)\n"
+            for r in recipes:
+                name = r.get('name', 'Unknown')[:24]
+                porosity = f"{r.get('measured_porosity', 0):.1f}%" if r.get('measured_porosity') else "N/A"
+                proof = f"{r.get('proof_time_min', 0):.0f} min" if r.get('proof_time_min') else "N/A"
+                output += f"{name:<25} {porosity:<12} {proof:<12}\n"
             
             self.stats_text.insert("1.0", output)
             self.stats_text.config(state=tk.DISABLED)
-            self.set_status(" Statistics dashboard refreshed", self.success_color)
+            self.set_status(" Statistics refreshed", self.success_color)
             
         except Exception as e:
             output = f"Error generating statistics dashboard:\n\n{str(e)}\n\n{traceback.format_exc()}"
@@ -1650,65 +1334,6 @@ FEATURE CONTRIBUTIONS:
         self.compare_text.config(state=tk.DISABLED)
         self.notebook.select(5)  # Switch to comparison tab
         self.set_status(" Recipes compared", self.success_color)
-    
-    def what_if_analysis(self):
-        """Perform what-if analysis on recipe modifications"""
-        if self.current_recipe_id is None:
-            messagebox.showwarning("Warning", "Please select a recipe first")
-            return
-        
-        recipe = self.recipe_db.get_recipe(self.current_recipe_id)
-        if not recipe:
-            return
-        
-        output = f"WHAT-IF ANALYSIS: {recipe.get('name', 'Unknown')}\n"
-        output += "=" * 80 + "\n\n"
-        
-        output += "Current Recipe:\n"
-        output += f"  Mixing Time: {recipe.get('mixing_time_min', 0):.0f} min\n"
-        output += f"  Proof Time: {recipe.get('proof_time_min', 0):.0f} min\n"
-        output += f"  Oven Temp: {recipe.get('oven_temp_c', 0):.0f}°C\n"
-        output += f"  Cook Time: {recipe.get('cook_time_min', 0):.0f} min\n"
-        output += f"  Current Porosity: {recipe.get('measured_porosity', 'N/A')}\n\n"
-        
-        output += "SIMULATED MODIFICATIONS:\n"
-        output += "-" * 80 + "\n\n"
-        
-        # Test variations
-        variations = [
-            {"mixing_time_min": recipe.get("mixing_time_min", 0) + 2},
-            {"mixing_time_min": max(0, recipe.get("mixing_time_min", 0) - 2)},
-            {"proof_time_min": recipe.get("proof_time_min", 0) + 10},
-            {"proof_time_min": max(0, recipe.get("proof_time_min", 0) - 10)},
-            {"oven_temp_c": recipe.get("oven_temp_c", 0) + 10},
-            {"oven_temp_c": max(100, recipe.get("oven_temp_c", 0) - 10)},
-        ]
-        
-        for i, mods in enumerate(variations, 1):
-            variant = recipe.copy()
-            variant.update(mods)
-            
-            pred_porosity, pred_info = self.recipe_predictor.predict_porosity(variant)
-            
-            mod_key = list(mods.keys())[0]
-            mod_value = mods[mod_key]
-            old_value = recipe.get(mod_key, 0)
-            
-            change = "+" if mod_value > old_value else ""
-            output += f"Scenario {i}: {mod_key} {old_value:.0f} → {mod_value:.0f}{change}\n"
-            
-            if pred_porosity:
-                original_pred, _ = self.recipe_predictor.predict_porosity(recipe)
-                diff = pred_porosity - original_pred if original_pred else 0
-                output += f"  Predicted Porosity: {pred_porosity:.1f}% (Δ {diff:+.1f}%)\n"
-            output += "\n"
-        
-        self.compare_text.config(state=tk.NORMAL)
-        self.compare_text.delete("1.0", tk.END)
-        self.compare_text.insert("1.0", output)
-        self.compare_text.config(state=tk.DISABLED)
-        self.notebook.select(5)  # Switch to comparison tab
-        self.set_status(" What-if analysis complete", self.success_color)
     
     def display_loaf_consistency(self):
         """Display loaf consistency analysis for multi-slice data"""
